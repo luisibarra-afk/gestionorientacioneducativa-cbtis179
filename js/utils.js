@@ -216,6 +216,40 @@ function membreteFooter(cfg) {
   </div>`;
 }
 
+// ===== AUTO-GUARDAR DOCUMENTO EN DRIVE (sin abrir modal) =====
+async function guardarDocEnDrive(htmlContent, expediente) {
+  if (!window.guardarPDFEnDrive) return false;
+  const tmp = document.createElement('div');
+  tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;';
+  tmp.innerHTML = htmlContent;
+  document.body.appendChild(tmp);
+  try {
+    await new Promise(r => setTimeout(r, 100));
+    const el = tmp.firstElementChild || tmp;
+    const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#fff', logging: false });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const a4H  = pdf.internal.pageSize.getHeight();
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfW, a4H);
+    return await window.guardarPDFEnDrive(pdf.output('blob'), expediente);
+  } catch(e) {
+    console.error('Drive auto-save:', e);
+    return false;
+  } finally {
+    document.body.removeChild(tmp);
+  }
+}
+
+// Advertir al cerrar si hay documentos sin respaldar en Drive
+window.addEventListener('beforeunload', function(e) {
+  const driveOn = document.getElementById('drive-status')?.classList.contains('status-on');
+  if (!driveOn) return;
+  const pending = ['justificantes','permisos','citatorios','reportes']
+    .some(k => obtenerDatos(k).some(r => !r.driveSaved));
+  if (pending) { e.preventDefault(); e.returnValue = ''; }
+});
+
 function copiarSQL() {
   const txt = document.getElementById('sql-content').textContent;
   navigator.clipboard.writeText(txt).then(() => mostrarToast('SQL copiado al portapapeles'));

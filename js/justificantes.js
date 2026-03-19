@@ -16,6 +16,7 @@ function renderJustificantes(datos) {
       <td><small>${j.validador || '-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirJustificante('${j.id}')"><i class="fas fa-file-pdf"></i></button>
+        <button class="btn-icon ${j.driveSaved?'drive':'drive-pend'}" title="${j.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveJustificante('${j.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarJustificante('${j.id}')"><i class="fas fa-edit"></i></button>
         <button class="btn-icon delete" title="Eliminar" onclick="eliminarJustificante('${j.id}')"><i class="fas fa-trash"></i></button>
       </div></td>
@@ -100,6 +101,7 @@ function nuevoJustificante() {
     registrarActividad('justificante', `Justificante ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderJustificantes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Justificante ${nuevo.folio} registrado`);
+    _driveJustificante(nuevo.id);
   });
   initAlumnoAutocomplete('j-alumno', function(a) {
     document.getElementById('j-alumno').value = a.nombre;
@@ -133,6 +135,7 @@ function editarJustificante(id) {
     guardarDatos(KEY_JUST, datos);
     if (window.sbSync) window.sbSync(KEY_JUST, [item]);
     cerrarModal(); renderJustificantes(); mostrarToast('Justificante actualizado');
+    _driveJustificante(item.id);
   });
   initAlumnoAutocomplete('j-alumno', function(a) {
     document.getElementById('j-alumno').value = a.nombre;
@@ -153,12 +156,8 @@ function eliminarJustificante(id) {
   renderJustificantes(); actualizarStats(); mostrarToast('Justificante eliminado');
 }
 
-function imprimirJustificante(id) {
-  const j = obtenerDatos(KEY_JUST).find(x => x.id === id);
-  if (!j) return;
-  const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
-  const html = `
+function _htmlDocJust(j, cfg) {
+  return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
       <div class="doc-tipo-titulo">Justificante de Inasistencia</div>
@@ -187,7 +186,28 @@ function imprimirJustificante(id) {
       </div>
       ${membreteFooter(cfg)}
     </div>`;
-  abrirPrint(`Justificante ${j.folio||j.id}`, html);
+}
+
+function imprimirJustificante(id) {
+  const j = obtenerDatos(KEY_JUST).find(x => x.id === id);
+  if (!j) return;
+  const cfg = obtenerConfig();
+  window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
+  abrirPrint(`Justificante ${j.folio||j.id}`, _htmlDocJust(j, cfg));
+}
+
+async function _driveJustificante(id) {
+  const datos = obtenerDatos(KEY_JUST);
+  const j = datos.find(x => x.id === id);
+  if (!j) return;
+  const cfg = obtenerConfig();
+  const expediente = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
+  const ok = await guardarDocEnDrive(_htmlDocJust(j, cfg), expediente);
+  if (ok) {
+    j.driveSaved = true;
+    guardarDatos(KEY_JUST, datos);
+    renderJustificantes();
+  }
 }
 
 function initJustificantes() {

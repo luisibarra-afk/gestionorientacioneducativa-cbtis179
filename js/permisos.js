@@ -16,6 +16,7 @@ function renderPermisos(datos) {
       <td><small>${p.validador||'-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirPermiso('${p.id}')"><i class="fas fa-file-pdf"></i></button>
+        <button class="btn-icon ${p.driveSaved?'drive':'drive-pend'}" title="${p.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_drivePermiso('${p.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarPermiso('${p.id}')"><i class="fas fa-edit"></i></button>
         <button class="btn-icon delete" title="Eliminar" onclick="eliminarPermiso('${p.id}')"><i class="fas fa-trash"></i></button>
       </div></td>
@@ -109,6 +110,7 @@ function nuevoPermiso() {
     registrarActividad('permiso', `Permiso ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderPermisos(); actualizarStats(); actualizarActividad();
     mostrarToast(`Permiso ${nuevo.folio} registrado`);
+    _drivePermiso(nuevo.id);
   });
   _acPermiso();
 }
@@ -135,6 +137,7 @@ function editarPermiso(id) {
     guardarDatos(KEY_PERM, datos);
     if (window.sbSync) window.sbSync(KEY_PERM, [item]);
     cerrarModal(); renderPermisos(); mostrarToast('Permiso actualizado');
+    _drivePermiso(item.id);
   });
   _acPermiso();
 }
@@ -146,12 +149,8 @@ function eliminarPermiso(id) {
   renderPermisos(); actualizarStats(); mostrarToast('Permiso eliminado');
 }
 
-function imprimirPermiso(id) {
-  const p = obtenerDatos(KEY_PERM).find(x => x.id === id);
-  if (!p) return;
-  const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
-  const html = `
+function _htmlDocPerm(p, cfg) {
+  return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
       <div class="doc-tipo-titulo">Permiso de Salida</div>
@@ -180,7 +179,28 @@ function imprimirPermiso(id) {
       </div>
       ${membreteFooter(cfg)}
     </div>`;
-  abrirPrint(`Permiso ${p.folio||p.id}`, html);
+}
+
+function imprimirPermiso(id) {
+  const p = obtenerDatos(KEY_PERM).find(x => x.id === id);
+  if (!p) return;
+  const cfg = obtenerConfig();
+  window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
+  abrirPrint(`Permiso ${p.folio||p.id}`, _htmlDocPerm(p, cfg));
+}
+
+async function _drivePermiso(id) {
+  const datos = obtenerDatos(KEY_PERM);
+  const p = datos.find(x => x.id === id);
+  if (!p) return;
+  const cfg = obtenerConfig();
+  const expediente = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
+  const ok = await guardarDocEnDrive(_htmlDocPerm(p, cfg), expediente);
+  if (ok) {
+    p.driveSaved = true;
+    guardarDatos(KEY_PERM, datos);
+    renderPermisos();
+  }
 }
 
 function initPermisos() {

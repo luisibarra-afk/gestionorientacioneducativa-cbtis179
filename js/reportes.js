@@ -27,6 +27,7 @@ function renderReportes(datos) {
       <td>${formatFecha(r.fecha)}</td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirReporte('${r.id}')"><i class="fas fa-file-pdf"></i></button>
+        <button class="btn-icon ${r.driveSaved?'drive':'drive-pend'}" title="${r.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveReporte('${r.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarReporte('${r.id}')"><i class="fas fa-edit"></i></button>
         <button class="btn-icon delete" title="Eliminar" onclick="eliminarReporte('${r.id}')"><i class="fas fa-trash"></i></button>
       </div></td>
@@ -97,6 +98,7 @@ function nuevoReporte() {
     registrarActividad('reporte', `Reporte ${nuevo.folio} — ${alumno} (${nuevo.tipoFalta})`);
     cerrarModal(); renderReportes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Reporte ${nuevo.folio} registrado`);
+    _driveReporte(nuevo.id);
   });
   initAlumnoAutocomplete('r-alumno', function(a) {
     document.getElementById('r-alumno').value = a.nombre;
@@ -127,6 +129,7 @@ function editarReporte(id) {
     guardarDatos(KEY_REP, datos);
     if (window.sbSync) window.sbSync(KEY_REP, [item]);
     cerrarModal(); renderReportes(); mostrarToast('Reporte actualizado');
+    _driveReporte(item.id);
   });
   initAlumnoAutocomplete('r-alumno', function(a) {
     document.getElementById('r-alumno').value = a.nombre;
@@ -145,12 +148,8 @@ function eliminarReporte(id) {
   renderReportes(); actualizarStats(); mostrarToast('Reporte eliminado');
 }
 
-function imprimirReporte(id) {
-  const r = obtenerDatos(KEY_REP).find(x => x.id === id);
-  if (!r) return;
-  const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, folio: r.folio, tipo: 'reporte' };
-  const html = `
+function _htmlDocRep(r, cfg) {
+  return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
       <div class="doc-tipo-titulo">Reporte de Conducta / Indisciplina</div>
@@ -176,7 +175,28 @@ function imprimirReporte(id) {
       </div>
       ${membreteFooter(cfg)}
     </div>`;
-  abrirPrint(`Reporte ${r.folio||r.id}`, html);
+}
+
+function imprimirReporte(id) {
+  const r = obtenerDatos(KEY_REP).find(x => x.id === id);
+  if (!r) return;
+  const cfg = obtenerConfig();
+  window._expedienteAlumno = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, folio: r.folio, tipo: 'reporte' };
+  abrirPrint(`Reporte ${r.folio||r.id}`, _htmlDocRep(r, cfg));
+}
+
+async function _driveReporte(id) {
+  const datos = obtenerDatos(KEY_REP);
+  const r = datos.find(x => x.id === id);
+  if (!r) return;
+  const cfg = obtenerConfig();
+  const expediente = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, folio: r.folio, tipo: 'reporte' };
+  const ok = await guardarDocEnDrive(_htmlDocRep(r, cfg), expediente);
+  if (ok) {
+    r.driveSaved = true;
+    guardarDatos(KEY_REP, datos);
+    renderReportes();
+  }
 }
 
 function initReportes() {

@@ -17,6 +17,7 @@ function renderCitatorios(datos) {
       <td><small>${c.validador||'-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirCitatorio('${c.id}')"><i class="fas fa-file-pdf"></i></button>
+        <button class="btn-icon ${c.driveSaved?'drive':'drive-pend'}" title="${c.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveCitatorio('${c.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarCitatorio('${c.id}')"><i class="fas fa-edit"></i></button>
         <button class="btn-icon delete" title="Eliminar" onclick="eliminarCitatorio('${c.id}')"><i class="fas fa-trash"></i></button>
       </div></td>
@@ -114,6 +115,7 @@ function nuevoCitatorio() {
     registrarActividad('citatorio', `Citatorio ${nuevo.folio} — tutor de ${alumno}`);
     cerrarModal(); renderCitatorios(); actualizarStats(); actualizarActividad();
     mostrarToast(`Citatorio ${nuevo.folio} registrado`);
+    _driveCitatorio(nuevo.id);
   });
   _acCitatorio();
 }
@@ -140,6 +142,7 @@ function editarCitatorio(id) {
     guardarDatos(KEY_CIT, datos);
     if (window.sbSync) window.sbSync(KEY_CIT, [item]);
     cerrarModal(); renderCitatorios(); mostrarToast('Citatorio actualizado');
+    _driveCitatorio(item.id);
   });
   _acCitatorio();
 }
@@ -151,12 +154,8 @@ function eliminarCitatorio(id) {
   renderCitatorios(); actualizarStats(); mostrarToast('Citatorio eliminado');
 }
 
-function imprimirCitatorio(id) {
-  const c = obtenerDatos(KEY_CIT).find(x => x.id === id);
-  if (!c) return;
-  const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
-  const html = `
+function _htmlDocCit(c, cfg) {
+  return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
       <div class="doc-tipo-titulo">Citatorio</div>
@@ -185,7 +184,28 @@ function imprimirCitatorio(id) {
       </div>
       ${membreteFooter(cfg)}
     </div>`;
-  abrirPrint(`Citatorio ${c.folio||c.id}`, html);
+}
+
+function imprimirCitatorio(id) {
+  const c = obtenerDatos(KEY_CIT).find(x => x.id === id);
+  if (!c) return;
+  const cfg = obtenerConfig();
+  window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
+  abrirPrint(`Citatorio ${c.folio||c.id}`, _htmlDocCit(c, cfg));
+}
+
+async function _driveCitatorio(id) {
+  const datos = obtenerDatos(KEY_CIT);
+  const c = datos.find(x => x.id === id);
+  if (!c) return;
+  const cfg = obtenerConfig();
+  const expediente = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
+  const ok = await guardarDocEnDrive(_htmlDocCit(c, cfg), expediente);
+  if (ok) {
+    c.driveSaved = true;
+    guardarDatos(KEY_CIT, datos);
+    renderCitatorios();
+  }
 }
 
 function initCitatorios() {

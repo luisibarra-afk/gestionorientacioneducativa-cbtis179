@@ -168,6 +168,10 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-10
 .btn-icon.delete:hover { background: #fee2e2; }
 .btn-icon.print { background: #f0fdf4; color: var(--green); }
 .btn-icon.print:hover { background: #dcfce7; }
+.btn-icon.drive { background: #f0fdf4; color: #16a34a; }
+.btn-icon.drive:hover { background: #dcfce7; }
+.btn-icon.drive-pend { background: #fffbeb; color: #d97706; }
+.btn-icon.drive-pend:hover { background: #fef3c7; }
 
 /* ===== FORMS ===== */
 .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px; }
