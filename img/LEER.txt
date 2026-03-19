@@ -1,0 +1,23 @@
+IMÁGENES NECESARIAS PARA EL MEMBRETE
+======================================
+
+Guarda aquí los siguientes archivos de imagen:
+
+1. logo-anio.png      → Imagen de Margarita Maza con texto "2026 año de..."
+                        (la que aparece en la esquina superior izquierda del membrete)
+
+2. logo-sep.png       → Logo de la SEP (Secretaría de Educación Pública)
+                        (escudo nacional + texto "Educación")
+
+3. logo-dgeti.png     → Logo circular de la DGETI
+                        (el engrane con las siglas DGETI)
+
+4. mujer-bandera.png  → Imagen de la mujer con bandera (esquina derecha del footer)
+
+NOTA: Si alguna imagen no está disponible, simplemente no aparecerá en el documento
+pero el resto del membrete sí se mostrará correctamente.
+
+CÓMO OBTENER LAS IMÁGENES:
+- Puedes hacer captura de pantalla del encabezado de un documento oficial
+- O copiarlas desde los documentos Word/PDF que ya tienen el membrete
+- Los logos oficiales de SEP y DGETI se pueden descargar del sitio de la DGEST

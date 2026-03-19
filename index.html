@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Orientación Educativa</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="school-logo"><i class="fas fa-graduation-cap"></i></div>
+      <div class="school-info">
+        <h2>Orientación</h2>
+        <p>Educativa</p>
+      </div>
+    </div>
+    <ul class="sidebar-menu">
+      <li><a href="#" class="nav-link active" data-page="dashboard"><i class="fas fa-home"></i><span>Inicio</span></a></li>
+      <li><a href="#" class="nav-link" data-page="justificantes"><i class="fas fa-file-medical"></i><span>Justificantes</span></a></li>
+      <li><a href="#" class="nav-link" data-page="permisos"><i class="fas fa-door-open"></i><span>Permisos de Salida</span></a></li>
+      <li><a href="#" class="nav-link" data-page="citatorios"><i class="fas fa-envelope-open-text"></i><span>Citatorios</span></a></li>
+      <li><a href="#" class="nav-link" data-page="reportes"><i class="fas fa-exclamation-triangle"></i><span>Reportes Disciplina</span></a></li>
+      <li><a href="#" class="nav-link" data-page="bitacora"><i class="fas fa-shield-alt"></i><span>Bitácora Seguridad</span></a></li>
+      <li><a href="#" class="nav-link" data-page="alumnos"><i class="fas fa-users"></i><span>Alumnos / Padrón</span></a></li>
+      <li class="separator"></li>
+      <li id="menu-config" class="hidden"><a href="#" class="nav-link" data-page="configuracion"><i class="fas fa-cog"></i><span>Configuración</span></a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <small id="current-date"></small>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-content" id="main-content">
+    <header class="topbar">
+      <button class="toggle-sidebar" id="toggle-sidebar"><i class="fas fa-bars"></i></button>
+      <div class="topbar-title" id="page-title">Panel Principal</div>
+      <div class="topbar-actions">
+        <span id="supabase-status" class="status-badge status-off" title="Supabase desconectado"><i class="fas fa-cloud"></i> <span>Sin BD</span></span>
+        <span id="drive-status" class="status-badge status-off" title="Google Drive no vinculado"><i class="fab fa-google-drive"></i> <span>Drive</span></span>
+        <div class="user-info-bar" id="user-info-bar">
+          <div class="user-avatar-sm" id="user-avatar-sm">?</div>
+          <span id="badge-orientador">Orientador(a)</span>
+          <span id="admin-crown-badge" class="hidden" title="Administrador"><i class="fas fa-crown"></i></span>
+          <span class="logout-divider"></span>
+          <button class="btn-logout" id="btn-logout" title="Cerrar sesión"><i class="fas fa-sign-out-alt"></i> <span class="logout-txt">Salir</span></button>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-area">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h1>Panel Principal</h1>
+          <p>Bienvenido al Sistema de Orientación Educativa</p>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card blue" data-page="justificantes">
+            <div class="stat-icon"><i class="fas fa-file-medical"></i></div>
+            <div class="stat-info"><h3 id="stat-justificantes">0</h3><p>Justificantes</p></div>
+          </div>
+          <div class="stat-card green" data-page="permisos">
+            <div class="stat-icon"><i class="fas fa-door-open"></i></div>
+            <div class="stat-info"><h3 id="stat-permisos">0</h3><p>Permisos de Salida</p></div>
+          </div>
+          <div class="stat-card orange" data-page="citatorios">
+            <div class="stat-icon"><i class="fas fa-envelope-open-text"></i></div>
+            <div class="stat-info"><h3 id="stat-citatorios">0</h3><p>Citatorios</p></div>
+          </div>
+          <div class="stat-card red" data-page="reportes">
+            <div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-info"><h3 id="stat-reportes">0</h3><p>Reportes Disciplina</p></div>
+          </div>
+          <div class="stat-card purple" data-page="bitacora">
+            <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+            <div class="stat-info"><h3 id="stat-bitacora">0</h3><p>Incidentes Seguridad</p></div>
+          </div>
+        </div>
+        <div class="recent-activity">
+          <h2>Actividad Reciente</h2>
+          <div id="recent-list" class="activity-list"><p class="empty-msg">No hay registros recientes.</p></div>
+        </div>
+      </div>
+
+      <!-- JUSTIFICANTES -->
+      <div id="page-justificantes" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-file-medical"></i> Justificantes</h1>
+          <button class="btn btn-primary" id="btn-nuevo-justificante"><i class="fas fa-plus"></i> Nuevo Justificante</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-justificantes" placeholder="Buscar por nombre, grupo o folio..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('justificantes')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Folio</th><th>Alumno</th><th>Grado/Grupo</th><th>Ausencia</th><th>Motivo</th><th>Validó</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-justificantes"><tr><td colspan="7" class="empty-row">No hay registros</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PERMISOS DE SALIDA -->
+      <div id="page-permisos" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-door-open"></i> Permisos de Salida</h1>
+          <button class="btn btn-primary" id="btn-nuevo-permiso"><i class="fas fa-plus"></i> Nuevo Permiso</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-permisos" placeholder="Buscar por nombre, grupo o folio..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('permisos')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Folio</th><th>Alumno</th><th>Grado/Grupo</th><th>Fecha/Hora</th><th>Motivo</th><th>Validó</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-permisos"><tr><td colspan="7" class="empty-row">No hay registros</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CITATORIOS -->
+      <div id="page-citatorios" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-envelope-open-text"></i> Citatorios</h1>
+          <button class="btn btn-primary" id="btn-nuevo-citatorio"><i class="fas fa-plus"></i> Nuevo Citatorio</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-citatorios" placeholder="Buscar por alumno, tutor o folio..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('citatorios')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Folio</th><th>Alumno</th><th>Grado/Grupo</th><th>Padre/Tutor</th><th>Fecha Cita</th><th>Estado</th><th>Validó</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-citatorios"><tr><td colspan="8" class="empty-row">No hay registros</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REPORTES DE DISCIPLINA -->
+      <div id="page-reportes" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-exclamation-triangle"></i> Reportes de Indisciplina</h1>
+          <button class="btn btn-primary" id="btn-nuevo-reporte"><i class="fas fa-plus"></i> Nuevo Reporte</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-reportes" placeholder="Buscar por alumno o grupo..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('reportes')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Folio</th><th>Alumno</th><th>Grado/Grupo</th><th>Tipo de Falta</th><th>Descripción</th><th>Medida</th><th>Fecha</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-reportes"><tr><td colspan="8" class="empty-row">No hay registros</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- BITÁCORA DE SEGURIDAD -->
+      <div id="page-bitacora" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-shield-alt"></i> Bitácora de Seguridad</h1>
+          <button class="btn btn-primary" id="btn-nuevo-incidente"><i class="fas fa-plus"></i> Registrar Incidente</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-bitacora" placeholder="Buscar por tipo o persona..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('bitacora')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Folio</th><th>Tipo</th><th>Involucrados</th><th>Lugar</th><th>Fecha/Hora</th><th>Descripción</th><th>Acciones Tomadas</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-bitacora"><tr><td colspan="8" class="empty-row">No hay registros</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ALUMNOS / PADRÓN -->
+      <div id="page-alumnos" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-users"></i> Alumnos / Padrón</h1>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-outline" id="btn-importar-csv"><i class="fas fa-file-csv"></i> Importar CSV</button>
+            <button class="btn btn-primary" id="btn-nuevo-alumno"><i class="fas fa-plus"></i> Nuevo Alumno</button>
+          </div>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-alumnos" placeholder="Buscar por nombre, No. Control, grado o grupo..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('alumnos')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead><tr><th>No. Control</th><th>Nombre</th><th>Grado/Grupo</th><th>Turno</th><th>Tutor</th><th>Teléfono</th><th>Acciones</th></tr></thead>
+            <tbody id="tbody-alumnos"><tr><td colspan="7" class="empty-row">No hay alumnos. Importa tu padrón con un archivo CSV.</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- EXPEDIENTE -->
+      <div id="page-expediente" class="page">
+        <div class="page-header">
+          <div>
+            <button class="btn btn-secondary" onclick="navegarA('alumnos')"><i class="fas fa-arrow-left"></i> Volver</button>
+          </div>
+          <h1 id="exp-titulo" style="flex:1;margin:0 16px"><i class="fas fa-folder-open"></i> Expediente</h1>
+          <button class="btn btn-primary" id="btn-exp-pdf" onclick="generarExpedientePDF()"><i class="fas fa-file-pdf"></i> Descargar PDF</button>
+        </div>
+        <div id="exp-body"></div>
+      </div>
+
+      <!-- CONFIGURACIÓN -->
+      <div id="page-configuracion" class="page">
+        <div class="page-header"><h1><i class="fas fa-cog"></i> Configuración</h1></div>
+
+        <div class="config-card">
+          <h2><i class="fas fa-school"></i> Datos del Plantel</h2>
+          <div class="form-grid">
+            <div class="form-group"><label>Nombre del Plantel</label><input type="text" id="cfg-plantel" class="form-control" placeholder="Ej: CBTIS No. 179"></div>
+            <div class="form-group"><label>Clave del Centro de Trabajo (CCT)</label><input type="text" id="cfg-cct" class="form-control" placeholder="Ej: 13DCT0001K"></div>
+            <div class="form-group"><label>Director(a)</label><input type="text" id="cfg-director" class="form-control" placeholder="Nombre del director(a)"></div>
+            <div class="form-group"><label>Ciclo Escolar</label><input type="text" id="cfg-ciclo" class="form-control" placeholder="Ej: 2025-2026"></div>
+            <div class="form-group"><label>Turno</label><select id="cfg-turno" class="form-control"><option>Matutino</option><option>Vespertino</option><option>Nocturno</option></select></div>
+            <div class="form-group form-full"><label>Dirección del Plantel</label><input type="text" id="cfg-direccion" class="form-control" placeholder="Calle, colonia, municipio, estado, CP"></div>
+            <div class="form-group"><label>Teléfonos</label><input type="text" id="cfg-telefonos" class="form-control" placeholder="7757535520 y 7757554420"></div>
+            <div class="form-group"><label>Correo Electrónico</label><input type="email" id="cfg-correo" class="form-control" placeholder="correo@uemstis.sems.gob.mx"></div>
+            <div class="form-group form-full"><label>Sitio Web / Facebook</label><input type="text" id="cfg-sitio" class="form-control" placeholder="https://www.facebook.com/cbtis179"></div>
+          </div>
+          <button class="btn btn-primary" onclick="guardarConfig()"><i class="fas fa-save"></i> Guardar Configuración</button>
+        </div>
+
+        <div class="config-card">
+          <h2><i class="fas fa-users"></i> Equipo de Orientadores</h2>
+          <p style="font-size:13px;color:#64748b;margin-bottom:16px">Estos son los orientadores que aparecerán en el campo "Validó" de cada documento.</p>
+          <div class="orientadores-list" id="orientadores-list"></div>
+        </div>
+
+        <div class="config-card supabase-card">
+          <h2><i class="fas fa-cloud"></i> Conexión Supabase (Base de Datos en la Nube)</h2>
+          <div id="supabase-connected-info" class="hidden">
+            <div class="alert alert-success"><i class="fas fa-check-circle"></i> Conectado a Supabase correctamente.</div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label>Supabase URL</label><input type="text" id="cfg-sb-url" class="form-control" placeholder="https://xxxx.supabase.co"></div>
+            <div class="form-group"><label>Supabase Anon Key</label><input type="password" id="cfg-sb-key" class="form-control" placeholder="eyJhbGciOiJIUzI1NiIs..."></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">
+            <button class="btn btn-primary" onclick="guardarConfigSupabase()"><i class="fas fa-plug"></i> Conectar y Guardar</button>
+            <button class="btn btn-outline" onclick="sincronizarManual()"><i class="fas fa-sync"></i> Sincronizar Ahora</button>
+          </div>
+          <details>
+            <summary style="cursor:pointer;font-weight:600;font-size:13px;color:#2563eb;margin-bottom:12px"><i class="fas fa-database"></i> Ver SQL para crear las tablas en Supabase</summary>
+            <div class="sql-box">
+              <button class="btn-copy-sql" onclick="copiarSQL()"><i class="fas fa-copy"></i> Copiar</button>
+              <pre id="sql-content">-- Ejecutar en el SQL Editor de Supabase
+
+create table if not exists justificantes (
+  id text primary key, folio text, alumno text, no_control text, grado text, grupo text,
+  fecha_ausencia text, fecha_expedicion text, tutor text, telefono_tutor text,
+  motivo text, observaciones text, validador text,
+  created_at timestamptz default now()
+);
+
+create table if not exists permisos (
+  id text primary key, folio text, alumno text, no_control text, grado text, grupo text,
+  fecha text, hora text, hora_regreso text, persona text, parentesco text,
+  telefono text, autoriza text, validador text, motivo text,
+  created_at timestamptz default now()
+);
+
+create table if not exists citatorios (
+  id text primary key, folio text, alumno text, no_control text, grado text, grupo text,
+  tutor text, telefono_tutor text, fecha_cita text, hora_cita text,
+  emite text, validador text, estado text, motivo text, acuerdos text,
+  fecha_creacion text, created_at timestamptz default now()
+);
+
+create table if not exists reportes (
+  id text primary key, folio text, alumno text, no_control text, grado text, grupo text,
+  fecha text, tipo_falta text, reporta text, descripcion text,
+  medida text, seguimiento text, created_at timestamptz default now()
+);
+
+create table if not exists bitacora (
+  id text primary key, folio text, tipo text, gravedad text, fecha text,
+  hora text, lugar text, reporta text, involucrados text, descripcion text,
+  acciones text, seguimiento text, created_at timestamptz default now()
+);
+
+create table if not exists alumnos (
+  id text primary key, no_control text unique, nombre text,
+  apellido_paterno text, apellido_materno text,
+  grado text, grupo text, turno text, curp text,
+  tutor text, telefono_tutor text, created_at timestamptz default now()
+);</pre>
+            </div>
+          </details>
+        </div>
+
+        <div class="config-card">
+          <h2><i class="fas fa-key"></i> Cambiar Contraseñas</h2>
+          <p style="font-size:13px;color:#64748b;margin-bottom:16px">Establece o cambia la contraseña de cada orientador.</p>
+          <div class="form-grid" id="pass-grid">
+            <div class="form-group">
+              <label><span class="av-dot av-1">MB</span> María Butrón Venegas</label>
+              <input type="password" id="pass-maria" class="form-control" placeholder="Nueva contraseña">
+            </div>
+            <div class="form-group">
+              <label><span class="av-dot av-2">LE</span> Luis Eduardo Ibarra H. <i class="fas fa-crown" style="color:#6366f1;font-size:11px"></i></label>
+              <input type="password" id="pass-luis" class="form-control" placeholder="Nueva contraseña">
+            </div>
+            <div class="form-group">
+              <label><span class="av-dot av-3">IT</span> Ivonne Teresa Ortega A.</label>
+              <input type="password" id="pass-ivonne" class="form-control" placeholder="Nueva contraseña">
+            </div>
+            <div class="form-group">
+              <label><span class="av-dot av-4">AP</span> Alfredo Pérez Torres</label>
+              <input type="password" id="pass-alfredo" class="form-control" placeholder="Nueva contraseña">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="guardarPasswords()"><i class="fas fa-save"></i> Guardar Contraseñas</button>
+          <p style="font-size:11px;color:#94a3b8;margin-top:10px">Deja en blanco los campos que no desees cambiar.</p>
+        </div>
+
+        <div class="config-card">
+          <h2><i class="fab fa-google-drive"></i> Google Drive (carpeta sincronizada)</h2>
+          <p style="font-size:13px;color:#64748b;margin-bottom:12px">Selecciona tu carpeta local de Google Drive. Los PDFs se guardarán automáticamente en <code>Expedientes/[Grado-Grupo]/[Control-Nombre]/</code> y Drive Desktop los subirá a la nube.</p>
+          <p id="drive-status-text" style="margin-bottom:12px;font-size:13px"><span style="color:#94a3b8">No vinculada</span></p>
+          <button class="btn btn-outline" onclick="seleccionarCarpetaDrive()"><i class="fas fa-folder-open"></i> Seleccionar carpeta de Drive</button>
+        </div>
+
+        <div class="config-card danger-zone">
+          <h2><i class="fas fa-database"></i> Gestión de Datos</h2>
+          <div style="display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-outline" onclick="exportarTodo()"><i class="fas fa-download"></i> Exportar Todo (CSV)</button>
+            <button class="btn btn-danger" onclick="confirmarBorrar()"><i class="fas fa-trash"></i> Borrar Todos los Datos Locales</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL UNIVERSAL -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal" id="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-title">Título</h2>
+        <button class="modal-close" id="modal-close"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modal-cancel">Cancelar</button>
+        <button class="btn btn-primary" id="modal-save">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL VISTA PREVIA / IMPRESIÓN / PDF -->
+  <div id="print-overlay" class="modal-overlay hidden">
+    <div class="modal modal-large" id="print-box">
+      <div class="modal-header">
+        <h2 id="print-title">Vista Previa</h2>
+        <button class="modal-close" id="print-close"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="print-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="print-cancel">Cerrar</button>
+        <button class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Imprimir</button>
+        <button class="btn btn-outline" id="btn-guardar-drive" onclick="guardarEnDriveDesdeModal()" style="display:none"><i class="fab fa-google-drive"></i> Guardar en Drive</button>
+        <button class="btn btn-primary" id="btn-descargar-pdf" onclick="descargarPDFActual()"><i class="fas fa-file-pdf"></i> Descargar PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast hidden"><i class="fas fa-check-circle"></i><span id="toast-msg"></span></div>
+
+  <!-- LIBRERÍAS -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+  <script src="js/auth.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/supabase-db.js"></script>
+  <script src="js/autocomplete.js"></script>
+  <script src="js/alumnos.js"></script>
+  <script src="js/drive.js"></script>
+  <script src="js/justificantes.js"></script>
+  <script src="js/permisos.js"></script>
+  <script src="js/citatorios.js"></script>
+  <script src="js/reportes.js"></script>
+  <script src="js/bitacora.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

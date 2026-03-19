@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iniciar Sesión — Orientación Educativa</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-700: #334155;
+      --gray-900: #0f172a;
+      --red: #dc2626;
+      --green: #16a34a;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #0f172a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-wrapper {
+      width: 100%;
+      max-width: 420px;
+    }
+    .login-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 25px 60px rgba(0,0,0,.35);
+      overflow: hidden;
+    }
+    .login-header {
+      background: linear-gradient(135deg, var(--blue) 0%, #1e3a8a 100%);
+      padding: 36px 32px 28px;
+      text-align: center;
+      color: #fff;
+    }
+    .login-icon {
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+      margin: 0 auto 16px;
+      border: 2px solid rgba(255,255,255,.3);
+    }
+    .login-header h1 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .login-header p { font-size: 13px; opacity: .8; }
+    .login-body { padding: 32px; }
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 7px;
+    }
+    .input-wrapper { position: relative; }
+    .input-wrapper i {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray-400);
+      font-size: 15px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 11px 12px 11px 38px;
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      background: var(--gray-50);
+      appearance: none;
+    }
+    .form-control:focus {
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+    }
+    .toggle-pass {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--gray-400);
+      cursor: pointer;
+      font-size: 15px;
+      padding: 0;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      line-height: 1;
+    }
+    .toggle-pass:hover { color: var(--gray-700); background: var(--gray-100); }
+    #input-pass { padding-right: 42px; }
+    .btn-login {
+      width: 100%;
+      padding: 13px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background .2s, transform .1s;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+    .btn-login:hover { background: var(--blue-dark); }
+    .btn-login:active { transform: scale(.98); }
+    .btn-login:disabled { opacity: .6; cursor: not-allowed; }
+    .error-msg {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: var(--red);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-msg.show { display: flex; }
+    .login-footer {
+      text-align: center;
+      padding: 16px 32px 24px;
+      border-top: 1px solid var(--gray-100);
+    }
+    .login-footer p { font-size: 12px; color: var(--gray-400); }
+    /* Usuarios rápidos */
+    .quick-users {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .quick-user {
+      border: 1.5px solid var(--gray-200);
+      border-radius: 8px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: all .15s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--gray-50);
+    }
+    .quick-user:hover { border-color: var(--blue); background: #eff6ff; }
+    .quick-user.selected { border-color: var(--blue); background: #eff6ff; box-shadow: 0 0 0 2px rgba(37,99,235,.2); }
+    .quick-user.admin-user { border-color: #c7d2fe; }
+    .quick-user.admin-user:hover { border-color: #6366f1; background: #eef2ff; }
+    .quick-user.admin-user.selected { border-color: #6366f1; background: #eef2ff; }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .av-1 { background: #2563eb; }
+    .av-2 { background: #6366f1; }
+    .av-3 { background: #ec4899; }
+    .av-4 { background: #f59e0b; }
+    .quick-info { min-width: 0; }
+    .quick-name { font-size: 11.5px; font-weight: 600; color: var(--gray-700); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .quick-role { font-size: 10px; color: var(--gray-400); }
+    .admin-crown { font-size: 10px; color: #6366f1; margin-left: 2px; }
+    .divider { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .divider span { font-size: 12px; color: var(--gray-400); white-space: nowrap; }
+    .divider::before, .divider::after { content: ''; flex: 1; border-top: 1px solid var(--gray-200); }
+  </style>
+</head>
+<body>
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-header">
+        <div class="login-icon"><i class="fas fa-graduation-cap"></i></div>
+        <h1>Orientación Educativa</h1>
+        <p>Sistema de Gestión Escolar</p>
+      </div>
+      <div class="login-body">
+        <p style="font-size:13px;color:#64748b;margin-bottom:16px;text-align:center">Selecciona tu usuario e ingresa tu contraseña</p>
+
+        <!-- Selección rápida de usuario -->
+        <div class="quick-users" id="quick-users">
+          <div class="quick-user" data-usuario="maria" onclick="seleccionarUsuario(this)">
+            <div class="avatar av-1">MB</div>
+            <div class="quick-info">
+              <div class="quick-name">María Butrón</div>
+              <div class="quick-role">Orientadora</div>
+            </div>
+          </div>
+          <div class="quick-user admin-user" data-usuario="luis" onclick="seleccionarUsuario(this)">
+            <div class="avatar av-2">LE</div>
+            <div class="quick-info">
+              <div class="quick-name">Luis Eduardo <i class="fas fa-crown admin-crown" title="Administrador"></i></div>
+              <div class="quick-role">Jefe / Admin</div>
+            </div>
+          </div>
+          <div class="quick-user" data-usuario="ivonne" onclick="seleccionarUsuario(this)">
+            <div class="avatar av-3">IT</div>
+            <div class="quick-info">
+              <div class="quick-name">Ivonne Ortega</div>
+              <div class="quick-role">Orientadora</div>
+            </div>
+          </div>
+          <div class="quick-user" data-usuario="alfredo" onclick="seleccionarUsuario(this)">
+            <div class="avatar av-4">AP</div>
+            <div class="quick-info">
+              <div class="quick-name">Alfredo Pérez</div>
+              <div class="quick-role">Orientador</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="divider"><span>Contraseña</span></div>
+
+        <!-- Mensaje de error -->
+        <div class="error-msg" id="error-msg">
+          <i class="fas fa-exclamation-circle"></i>
+          <span id="error-text">Contraseña incorrecta</span>
+        </div>
+
+        <!-- Formulario -->
+        <div class="form-group">
+          <label><i class="fas fa-user" style="margin-right:5px;color:#2563eb"></i> Usuario seleccionado</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input type="text" id="input-nombre" class="form-control" readonly placeholder="Selecciona un usuario arriba" style="cursor:default;color:#475569">
+          </div>
+        </div>
+        <div class="form-group">
+          <label><i class="fas fa-lock" style="margin-right:5px;color:#2563eb"></i> Contraseña</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="input-pass" class="form-control" placeholder="Ingresa tu contraseña" autocomplete="current-password">
+            <button class="toggle-pass" type="button" onclick="togglePass()"><i class="fas fa-eye" id="eye-icon"></i></button>
+          </div>
+        </div>
+        <button class="btn-login" id="btn-login" onclick="intentarLogin()">
+          <i class="fas fa-sign-in-alt"></i> Ingresar al Sistema
+        </button>
+      </div>
+      <div class="login-footer">
+        <p><i class="fas fa-shield-alt" style="color:#2563eb;margin-right:4px"></i>Acceso restringido al personal autorizado</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    let usuarioSeleccionado = null;
+
+    function seleccionarUsuario(el) {
+      document.querySelectorAll('.quick-user').forEach(u => u.classList.remove('selected'));
+      el.classList.add('selected');
+      usuarioSeleccionado = el.dataset.usuario;
+      const nombres = {
+        maria: 'María Butrón Venegas',
+        luis: 'Luis Eduardo Ibarra Hernández',
+        ivonne: 'Ivonne Teresa Ortega Alfaro',
+        alfredo: 'Alfredo Pérez Torres'
+      };
+      document.getElementById('input-nombre').value = nombres[usuarioSeleccionado] || '';
+      document.getElementById('input-pass').focus();
+      ocultarError();
+    }
+
+    function togglePass() {
+      const inp = document.getElementById('input-pass');
+      const ico = document.getElementById('eye-icon');
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        ico.className = 'fas fa-eye-slash';
+      } else {
+        inp.type = 'password';
+        ico.className = 'fas fa-eye';
+      }
+    }
+
+    function ocultarError() {
+      document.getElementById('error-msg').classList.remove('show');
+    }
+
+    function mostrarError(msg) {
+      const el = document.getElementById('error-msg');
+      document.getElementById('error-text').textContent = msg;
+      el.classList.add('show');
+    }
+
+    function intentarLogin() {
+      if (!usuarioSeleccionado) { mostrarError('Por favor selecciona un usuario'); return; }
+      const pass = document.getElementById('input-pass').value;
+      if (!pass) { mostrarError('Ingresa tu contraseña'); return; }
+      const btn = document.getElementById('btn-login');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+      setTimeout(() => {
+        const ok = verificarCredenciales(usuarioSeleccionado, pass);
+        if (ok) {
+          btn.innerHTML = '<i class="fas fa-check-circle"></i> ¡Bienvenido!';
+          btn.style.background = '#16a34a';
+          setTimeout(() => { window.location.href = 'index.html'; }, 600);
+        } else {
+          mostrarError('Contraseña incorrecta. Inténtalo de nuevo.');
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Ingresar al Sistema';
+          document.getElementById('input-pass').value = '';
+          document.getElementById('input-pass').focus();
+        }
+      }, 500);
+    }
+
+    // Enter para login
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter') intentarLogin();
+    });
+
+    // Si ya está logueado, redirigir directo
+    if (sessionStorage.getItem('oe_usuario')) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>
