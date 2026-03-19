@@ -116,6 +116,30 @@ window.guardarPDFEnDrive = async function(blob, alumno) {
   }
 };
 
+// ---- Guardar cualquier archivo en una carpeta específica (sin subcarpetas) ----
+window.guardarArchivoEnDrive = async function(blob, fileName, carpeta) {
+  if (!_driveHandle) _driveHandle = await _recuperarHandleIDB();
+  if (!_driveHandle) return false;
+  try {
+    let perm = await _driveHandle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+      perm = await _driveHandle.requestPermission({ mode: 'readwrite' });
+      if (perm !== 'granted') { mostrarToast('Se necesita permiso para escribir en Drive', 'error'); return false; }
+    }
+    const dir = await _driveHandle.getDirectoryHandle(limpiarNombre(carpeta), { create: true });
+    const fileHandle = await dir.getFileHandle(limpiarNombre(fileName), { create: true });
+    const writable = await fileHandle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+    mostrarToast(`Guardado: ${fileName}`);
+    return true;
+  } catch(e) {
+    console.error('Drive error:', e);
+    mostrarToast('No se pudo guardar en Drive: ' + e.message, 'error');
+    return false;
+  }
+};
+
 function limpiarNombre(str) {
   return str.replace(/[<>:"/\\|?*]/g, '').replace(/\s+/g, ' ').trim().slice(0, 80);
 }

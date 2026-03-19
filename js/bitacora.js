@@ -32,6 +32,7 @@ function renderBitacora(datos) {
         <div class="btn-actions">
           <button class="btn-icon view" title="Ver detalle" onclick="verIncidente('${b.id}')"><i class="fas fa-eye"></i></button>
           <button class="btn-icon print" title="Vista previa / PDF" onclick="imprimirIncidente('${b.id}')"><i class="fas fa-file-pdf"></i></button>
+          <button class="btn-icon ${b.driveSaved?'drive':'drive-pend'}" title="${b.driveSaved?'Guardado en Drive':'Guardar PDF en Drive'}" onclick="_driveBitPDF('${b.id}')"><i class="fab fa-google-drive"></i></button>
           <button class="btn-icon edit" title="Editar" onclick="editarIncidente('${b.id}')"><i class="fas fa-edit"></i></button>
           <button class="btn-icon delete" title="Eliminar" onclick="eliminarIncidente('${b.id}')"><i class="fas fa-trash"></i></button>
         </div>
@@ -119,6 +120,7 @@ function nuevoIncidente() {
     actualizarStats();
     actualizarActividad();
     mostrarToast(`Incidente ${nuevo.folio} registrado en bitácora`);
+    _driveBitPDF(nuevo.id);
   });
 }
 
@@ -142,6 +144,7 @@ function editarIncidente(id) {
     cerrarModal();
     renderBitacora();
     mostrarToast('Incidente actualizado');
+    _driveBitPDF(item.id);
   });
 }
 
@@ -173,18 +176,12 @@ function eliminarIncidente(id) {
   mostrarToast('Registro eliminado de la bitácora');
 }
 
-function imprimirIncidente(id) {
-  const b = obtenerDatos(KEY_BIT).find(x => x.id === id);
-  if (!b) return;
-  const cfg = obtenerConfig();
-  const html = `
+function _htmlDocBit(b, cfg) {
+  return `
     <div class="doc-preview" id="doc-to-pdf">
-      <div class="doc-header">
-        <div class="plantel">${cfg.plantel}</div>
-        <div class="doc-sub">${cfg.cct ? 'C.C.T.: ' + cfg.cct : ''} &nbsp;|&nbsp; Turno: ${cfg.turno}</div>
-        <div class="doc-type">Bitácora de Seguridad — Registro de Incidente</div>
-        <div class="ciclo">Ciclo Escolar ${cfg.ciclo}</div>
-      </div>
+      ${membreteHeader(cfg)}
+      <div class="doc-tipo-titulo">Bitácora de Seguridad — Registro de Incidente</div>
+      <div class="doc-ciclo">Ciclo Escolar ${cfg.ciclo}</div>
       <div class="doc-folio-row">
         <span class="folio-label">FOLIO: <strong>${b.folio || b.id.toUpperCase()}</strong></span>
         <span class="folio-fecha">Fecha: ${formatFecha(b.fecha)} ${b.hora || ''}</span>
@@ -201,19 +198,79 @@ function imprimirIncidente(id) {
         <p><strong>Reportado por:</strong> ${b.reporta || '________________________'}</p>
       </div>
       <div class="doc-signature">
-        <div class="signature-box">
-          <div class="sig-line"></div>
-          <p>${b.reporta || cfg.orientadores?.[0] || 'Orientador(a)'}</p>
-          <small>Quien reporta</small>
-        </div>
-        <div class="signature-box">
-          <div class="sig-line"></div>
-          <p>${cfg.director || 'Director(a)'}</p>
-          <small>Visto bueno Dirección</small>
-        </div>
+        <div class="signature-box"><div class="sig-line"></div><p>${b.reporta || cfg.orientadores?.[0] || 'Orientador(a)'}</p><small>Quien reporta</small></div>
+        <div class="signature-box"><div class="sig-line"></div><p>${cfg.director || 'Director(a)'}</p><small>Visto bueno Dirección</small></div>
       </div>
+      ${membreteFooter(cfg)}
     </div>`;
-  abrirPrint(`Incidente ${b.folio || b.id}`, html);
+}
+
+function imprimirIncidente(id) {
+  const b = obtenerDatos(KEY_BIT).find(x => x.id === id);
+  if (!b) return;
+  const cfg = obtenerConfig();
+  abrirPrint(`Incidente ${b.folio || b.id}`, _htmlDocBit(b, cfg));
+}
+
+async function _driveBitPDF(id) {
+  const datos = obtenerDatos(KEY_BIT);
+  const b = datos.find(x => x.id === id);
+  if (!b || !window.guardarArchivoEnDrive) return;
+  const cfg = obtenerConfig();
+  const ciclo = cfg.ciclo || '2025-2026';
+  const carpeta = `Bitácora de Seguridad ${ciclo}`;
+  const tmp = document.createElement('div');
+  tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;background:#fff;';
+  tmp.innerHTML = _htmlDocBit(b, cfg);
+  document.body.appendChild(tmp);
+  try {
+    await new Promise(r => setTimeout(r, 100));
+    const canvas = await html2canvas(tmp.firstElementChild || tmp, { scale: 2, useCORS: true, backgroundColor: '#fff', logging: false });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const a4H  = pdf.internal.pageSize.getHeight();
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pdfW, a4H);
+    const fileName = `${b.folio || b.id}_${b.tipo.replace(/[\s\/]/g,'-')}_${b.fecha}.pdf`;
+    const ok = await window.guardarArchivoEnDrive(pdf.output('blob'), fileName, carpeta);
+    if (ok) {
+      b.driveSaved = true;
+      guardarDatos(KEY_BIT, datos);
+      renderBitacora();
+    }
+  } catch(e) {
+    mostrarToast('Error al generar PDF: ' + e.message, 'error');
+  } finally {
+    document.body.removeChild(tmp);
+  }
+}
+
+async function _driveBitExcel() {
+  if (!window.guardarArchivoEnDrive) { mostrarToast('Drive no vinculado', 'error'); return; }
+  const datos = obtenerDatos(KEY_BIT);
+  if (!datos.length) { mostrarToast('No hay registros en la bitácora', 'error'); return; }
+  const cfg = obtenerConfig();
+  const ciclo = cfg.ciclo || '2025-2026';
+  const filas = datos.map(b => ({
+    'Folio': b.folio || '-',
+    'Tipo': b.tipo,
+    'Gravedad': b.gravedad,
+    'Fecha': formatFecha(b.fecha),
+    'Hora': b.hora || '',
+    'Lugar': b.lugar || '',
+    'Involucrados': b.involucrados,
+    'Descripción': b.descripcion,
+    'Acciones Tomadas': b.acciones,
+    'Seguimiento': b.seguimiento || '',
+    'Reportado por': b.reporta || ''
+  }));
+  const ws = XLSX.utils.json_to_sheet(filas);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Bitácora');
+  const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+  const blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const fileName = `Bitacora_Seguridad_${fechaHoy()}.xlsx`;
+  await window.guardarArchivoEnDrive(blob, fileName, `Bitácora de Seguridad ${ciclo}`);
 }
 
 function initBitacora() {
