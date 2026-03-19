@@ -2,12 +2,13 @@
 
 const KEY_BIT = 'bitacora';
 
-const TIPOS_INC = ['Accidente','Conflicto entre alumnos','Conflicto alumno-docente','Intrusión/persona ajena','Robo o extravío','Daño a instalaciones','Situación de emergencia','Otro'];
+const TIPOS_INC = ['Accidente','Atención Médica','Conflicto entre alumnos','Conflicto alumno-docente','Intrusión/persona ajena','Robo o extravío','Daño a instalaciones','Situación de emergencia','Otro'];
 const GRAVEDAD_INC = ['Leve','Moderado','Grave','Muy grave'];
 
 function badgeIncidente(tipo) {
   if (!tipo) return 'otro';
   if (tipo.toLowerCase().includes('accidente')) return 'accidente';
+  if (tipo.toLowerCase().includes('médica') || tipo.toLowerCase().includes('medica')) return 'medico';
   if (tipo.toLowerCase().includes('conflicto')) return 'conflicto';
   return 'otro';
 }
@@ -41,11 +42,13 @@ function renderBitacora(datos) {
 }
 
 function formularioIncidente(datos = {}) {
+  const esMedico = datos.tipo === 'Atención Médica';
+  const equipoSi = datos.equipoPrestado === 'Sí';
   return `
     <div class="form-grid">
       <div class="form-group">
         <label>Tipo de Incidente *</label>
-        <select id="b-tipo" class="form-control">
+        <select id="b-tipo" class="form-control" onchange="document.getElementById('medicos-fields').style.display=this.value==='Atención Médica'?'block':'none'">
           ${TIPOS_INC.map(t => `<option ${datos.tipo===t?'selected':''}>${t}</option>`).join('')}
         </select>
       </div>
@@ -87,7 +90,78 @@ function formularioIncidente(datos = {}) {
         <label>Seguimiento / Observaciones</label>
         <textarea id="b-seguimiento" class="form-control">${datos.seguimiento || ''}</textarea>
       </div>
+
+      <!-- CAMPOS ATENCIÓN MÉDICA -->
+      <div class="form-group form-full" id="medicos-fields" style="${esMedico ? '' : 'display:none'}">
+        <div style="border-top:2px solid #e2e8f0;margin:4px 0 14px;padding-top:14px">
+          <strong style="color:#0f172a;font-size:14px"><i class="fas fa-heartbeat" style="color:#ef4444"></i> Datos de Atención Médica</strong>
+        </div>
+        <div class="form-grid" style="margin:0">
+          <div class="form-group">
+            <label>Signos Vitales</label>
+            <input type="text" id="b-signosVitales" class="form-control" value="${datos.signosVitales||''}" placeholder="Descripción general">
+          </div>
+          <div class="form-group">
+            <label>Presión Arterial</label>
+            <input type="text" id="b-presion" class="form-control" value="${datos.presion||''}" placeholder="120/80 mmHg">
+          </div>
+          <div class="form-group">
+            <label>Temperatura</label>
+            <input type="text" id="b-temperatura" class="form-control" value="${datos.temperatura||''}" placeholder="°C">
+          </div>
+          <div class="form-group">
+            <label>Pulso</label>
+            <input type="text" id="b-pulso" class="form-control" value="${datos.pulso||''}" placeholder="lpm">
+          </div>
+          <div class="form-group form-full">
+            <label>¿Sufre alergias?</label>
+            <input type="text" id="b-alergias" class="form-control" value="${datos.alergias||''}" placeholder="Especificar o escribir 'Ninguna'">
+          </div>
+          <div class="form-group form-full">
+            <label>Medicamento administrado</label>
+            <input type="text" id="b-medicamento" class="form-control" value="${datos.medicamento||''}" placeholder="Nombre del medicamento y dosis">
+          </div>
+          <div class="form-group">
+            <label>¿Se prestó equipo?</label>
+            <select id="b-equipoPrestado" class="form-control" onchange="document.getElementById('equipo-detalle').style.display=this.value==='Sí'?'contents':'none'">
+              <option ${!equipoSi?'selected':''}>No</option>
+              <option ${equipoSi?'selected':''}>Sí</option>
+            </select>
+          </div>
+          <div id="equipo-detalle" style="${equipoSi ? 'contents' : 'display:none'}">
+            <div class="form-group">
+              <label>¿Cuál equipo?</label>
+              <input type="text" id="b-equipoCual" class="form-control" value="${datos.equipoCual||''}" placeholder="Descripción del equipo">
+            </div>
+            <div class="form-group">
+              <label>Fecha de entrega</label>
+              <input type="date" id="b-equipoEntrega" class="form-control" value="${datos.equipoEntrega||fechaHoy()}">
+            </div>
+            <div class="form-group">
+              <label>Fecha de devolución</label>
+              <input type="date" id="b-equipoDevolucion" class="form-control" value="${datos.equipoDevolucion||''}">
+            </div>
+          </div>
+        </div>
+      </div>
     </div>`;
+}
+
+function _leerMedico() {
+  if (document.getElementById('b-tipo')?.value !== 'Atención Médica') return {};
+  const eq = document.getElementById('b-equipoPrestado')?.value || 'No';
+  return {
+    signosVitales: document.getElementById('b-signosVitales')?.value.trim() || '',
+    presion:       document.getElementById('b-presion')?.value.trim() || '',
+    temperatura:   document.getElementById('b-temperatura')?.value.trim() || '',
+    pulso:         document.getElementById('b-pulso')?.value.trim() || '',
+    alergias:      document.getElementById('b-alergias')?.value.trim() || '',
+    medicamento:   document.getElementById('b-medicamento')?.value.trim() || '',
+    equipoPrestado: eq,
+    equipoCual:      eq === 'Sí' ? (document.getElementById('b-equipoCual')?.value.trim() || '') : '',
+    equipoEntrega:   eq === 'Sí' ? (document.getElementById('b-equipoEntrega')?.value || '') : '',
+    equipoDevolucion:eq === 'Sí' ? (document.getElementById('b-equipoDevolucion')?.value || '') : ''
+  };
 }
 
 function nuevoIncidente() {
@@ -109,7 +183,8 @@ function nuevoIncidente() {
       involucrados,
       descripcion,
       acciones,
-      seguimiento: document.getElementById('b-seguimiento').value.trim()
+      seguimiento: document.getElementById('b-seguimiento').value.trim(),
+      ..._leerMedico()
     };
     datos.unshift(nuevo);
     guardarDatos(KEY_BIT, datos);
@@ -139,6 +214,7 @@ function editarIncidente(id) {
     item.descripcion = document.getElementById('b-descripcion').value.trim();
     item.acciones = document.getElementById('b-acciones').value.trim();
     item.seguimiento = document.getElementById('b-seguimiento').value.trim();
+    Object.assign(item, _leerMedico());
     guardarDatos(KEY_BIT, datos);
     if (window.sbSync) window.sbSync(KEY_BIT, [item]);
     cerrarModal();
@@ -163,6 +239,21 @@ function verIncidente(id) {
       <tr><td style="font-weight:600;color:#475569;padding:4px 0;vertical-align:top">Descripción:</td><td>${b.descripcion}</td></tr>
       <tr><td style="font-weight:600;color:#475569;padding:4px 0;vertical-align:top">Acciones:</td><td>${b.acciones}</td></tr>
       ${b.seguimiento ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0;vertical-align:top">Seguimiento:</td><td>${b.seguimiento}</td></tr>` : ''}
+      ${b.tipo === 'Atención Médica' ? `
+      <tr><td colspan="2" style="padding-top:12px;font-weight:700;color:#ef4444;font-size:13px"><i class="fas fa-heartbeat"></i> Atención Médica</td></tr>
+      ${b.signosVitales ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Signos vitales:</td><td>${b.signosVitales}</td></tr>` : ''}
+      ${b.presion ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Presión arterial:</td><td>${b.presion}</td></tr>` : ''}
+      ${b.temperatura ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Temperatura:</td><td>${b.temperatura}</td></tr>` : ''}
+      ${b.pulso ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Pulso:</td><td>${b.pulso}</td></tr>` : ''}
+      ${b.alergias ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Alergias:</td><td>${b.alergias}</td></tr>` : ''}
+      ${b.medicamento ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Medicamento:</td><td>${b.medicamento}</td></tr>` : ''}
+      <tr><td style="font-weight:600;color:#475569;padding:4px 0">Equipo prestado:</td><td>${b.equipoPrestado || 'No'}</td></tr>
+      ${b.equipoPrestado === 'Sí' ? `
+        ${b.equipoCual ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">¿Cuál equipo?</td><td>${b.equipoCual}</td></tr>` : ''}
+        ${b.equipoEntrega ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Fecha de entrega:</td><td>${formatFecha(b.equipoEntrega)}</td></tr>` : ''}
+        ${b.equipoDevolucion ? `<tr><td style="font-weight:600;color:#475569;padding:4px 0">Fecha de devolución:</td><td>${formatFecha(b.equipoDevolucion)}</td></tr>` : ''}
+      ` : ''}
+      ` : ''}
     </table>`;
   abrirModal(`${b.folio || 'Incidente'} — ${b.tipo}`, html, null);
 }
@@ -195,6 +286,20 @@ function _htmlDocBit(b, cfg) {
         <p><strong>Acciones tomadas:</strong></p>
         <p style="padding-left:20px">${b.acciones}</p>
         ${b.seguimiento ? `<p><strong>Seguimiento:</strong></p><p style="padding-left:20px">${b.seguimiento}</p>` : ''}
+        ${b.tipo === 'Atención Médica' ? `
+        <hr style="margin:14px 0;border-color:#fca5a5">
+        <p style="color:#dc2626;font-weight:700"><i class="fas fa-heartbeat"></i> Atención Médica</p>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;line-height:1.8">
+          ${b.signosVitales ? `<tr><td style="font-weight:600;width:160px">Signos vitales:</td><td>${b.signosVitales}</td></tr>` : ''}
+          ${b.presion ? `<tr><td style="font-weight:600">Presión arterial:</td><td>${b.presion}</td></tr>` : ''}
+          ${b.temperatura ? `<tr><td style="font-weight:600">Temperatura:</td><td>${b.temperatura}</td></tr>` : ''}
+          ${b.pulso ? `<tr><td style="font-weight:600">Pulso:</td><td>${b.pulso}</td></tr>` : ''}
+          ${b.alergias ? `<tr><td style="font-weight:600">Alergias:</td><td>${b.alergias}</td></tr>` : ''}
+          ${b.medicamento ? `<tr><td style="font-weight:600">Medicamento:</td><td>${b.medicamento}</td></tr>` : ''}
+          <tr><td style="font-weight:600">Equipo prestado:</td><td>${b.equipoPrestado || 'No'}${b.equipoCual ? ' — ' + b.equipoCual : ''}</td></tr>
+          ${b.equipoPrestado === 'Sí' && b.equipoEntrega ? `<tr><td style="font-weight:600">Fecha entrega:</td><td>${formatFecha(b.equipoEntrega)}</td></tr>` : ''}
+          ${b.equipoPrestado === 'Sí' && b.equipoDevolucion ? `<tr><td style="font-weight:600">Fecha devolución:</td><td>${formatFecha(b.equipoDevolucion)}</td></tr>` : ''}
+        </table>` : ''}
         <p><strong>Reportado por:</strong> ${b.reporta || '________________________'}</p>
       </div>
       <div class="doc-signature">
@@ -262,7 +367,17 @@ async function _driveBitExcel() {
     'Descripción': b.descripcion,
     'Acciones Tomadas': b.acciones,
     'Seguimiento': b.seguimiento || '',
-    'Reportado por': b.reporta || ''
+    'Reportado por': b.reporta || '',
+    'Signos Vitales': b.signosVitales || '',
+    'Presión': b.presion || '',
+    'Temperatura': b.temperatura || '',
+    'Pulso': b.pulso || '',
+    'Alergias': b.alergias || '',
+    'Medicamento': b.medicamento || '',
+    'Equipo Prestado': b.equipoPrestado || '',
+    'Cuál Equipo': b.equipoCual || '',
+    'Fecha Entrega Equipo': b.equipoEntrega ? formatFecha(b.equipoEntrega) : '',
+    'Fecha Devolución Equipo': b.equipoDevolucion ? formatFecha(b.equipoDevolucion) : ''
   }));
   const ws = XLSX.utils.json_to_sheet(filas);
   const wb = XLSX.utils.book_new();

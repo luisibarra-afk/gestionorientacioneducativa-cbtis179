@@ -148,6 +148,7 @@ body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--gray-10
 .badge-accidente { background: #fff7ed; color: #9a3412; }
 .badge-conflicto { background: #fef2f2; color: var(--red); }
 .badge-otro { background: var(--gray-100); color: var(--gray-600); }
+.badge-medico { background: #fef2f2; color: #dc2626; }
 
 /* ===== BUTTONS ===== */
 .btn { display: inline-flex; align-items: center; gap: 7px; padding: 9px 18px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all var(--transition); text-decoration: none; }
