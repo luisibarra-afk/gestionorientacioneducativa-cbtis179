@@ -65,39 +65,49 @@ async function iniciarDrive() {
 }
 
 // ---- Guardar PDF en carpeta ----
-// alumno: { noControl, nombre, grado, grupo, tipo }
-// tipo: 'justificante' | 'permiso' | 'citatorio' | 'reporte' | 'expediente'
+// Estructura: EXPEDIENTES [CICLO] / [SEMESTRE] - [CARRERA] - [TURNO] / [APELLIDO PATERNO APELLIDO MATERNO NOMBRE]
 window.guardarPDFEnDrive = async function(blob, alumno) {
-  if (!_driveHandle) {
-    _driveHandle = await _recuperarHandleIDB();
-  }
+  if (!_driveHandle) _driveHandle = await _recuperarHandleIDB();
   if (!_driveHandle) return false;
 
   try {
-    // Solicitar permiso si expiró
     let perm = await _driveHandle.queryPermission({ mode: 'readwrite' });
     if (perm !== 'granted') {
       perm = await _driveHandle.requestPermission({ mode: 'readwrite' });
       if (perm !== 'granted') { mostrarToast('Se necesita permiso para escribir en Drive', 'error'); return false; }
     }
 
-    // Estructura: Expedientes / [Grado-Grupo] / [NoControl]-[Nombre] /
-    const gradoGrupo = `${(alumno.grado || '').replace('°','')}-${alumno.grupo || 'Sin-Grupo'}`;
-    const carpetaAlumno = limpiarNombre(`${alumno.noControl || 'SN'}-${alumno.nombre || 'Alumno'}`);
+    // Ciclo desde config
+    const cfg = typeof obtenerConfig === 'function' ? obtenerConfig() : {};
+    const ciclo = cfg.ciclo || '2025-2026';
 
-    const dirExp = await _driveHandle.getDirectoryHandle('Expedientes', { create: true });
-    const dirGrado = await dirExp.getDirectoryHandle(gradoGrupo, { create: true });
-    const dirAlu = await dirGrado.getDirectoryHandle(carpetaAlumno, { create: true });
+    // Nombre del alumno: APELLIDO PATERNO APELLIDO MATERNO NOMBRE(S)
+    // Buscar en caché para obtener apellidos separados
+    const cache = window._alumnosCache || [];
+    const aluCompleto = cache.find(a => a.noControl && a.noControl === alumno.noControl) || {};
+    const apPat    = (aluCompleto.apellidoPaterno || '').toUpperCase().trim();
+    const apMat    = (aluCompleto.apellidoMaterno || '').toUpperCase().trim();
+    const nomProp  = (aluCompleto.nombrePropio || '').toUpperCase().trim();
+    // Si no hay datos en caché, usar el nombre completo tal cual
+    const nombreCarpeta = limpiarNombre(
+      [apPat, apMat, nomProp].filter(Boolean).join(' ') || (alumno.nombre || 'SIN-NOMBRE').toUpperCase()
+    );
 
-    const fecha = new Date().toISOString().slice(0,10);
-    const tipo = alumno.tipo || 'documento';
-    const fileName = `${tipo}_${alumno.noControl || 'SN'}_${fecha}.pdf`;
+    // Estructura: Expedientes [ciclo] / [NOMBRE ALUMNO]
+    const dirRaiz = await _driveHandle.getDirectoryHandle(`Expedientes ${ciclo}`, { create: true });
+    const dirAlu  = await dirRaiz.getDirectoryHandle(nombreCarpeta, { create: true });
+
+    // Nombre del archivo: TIPO_FOLIO_FECHA.pdf
+    const fecha    = new Date().toISOString().slice(0, 10);
+    const tipo     = (alumno.tipo || 'documento').toUpperCase();
+    const folio    = alumno.folio || alumno.noControl || 'SN';
+    const fileName = `${tipo}_${folio}_${fecha}.pdf`;
 
     const fileHandle = await dirAlu.getFileHandle(fileName, { create: true });
-    const writable = await fileHandle.createWritable();
+    const writable   = await fileHandle.createWritable();
     await writable.write(blob);
     await writable.close();
-    mostrarToast(`Guardado en Drive: ${fileName}`);
+    mostrarToast(`Guardado en Drive: ${nombreCarpeta}`);
     return true;
   } catch (e) {
     console.error('Drive error:', e);

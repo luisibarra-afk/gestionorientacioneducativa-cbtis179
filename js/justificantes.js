@@ -157,7 +157,7 @@ function imprimirJustificante(id) {
   const j = obtenerDatos(KEY_JUST).find(x => x.id === id);
   if (!j) return;
   const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, tipo: 'justificante' };
+  window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
   const html = `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}

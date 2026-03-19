@@ -149,7 +149,7 @@ function imprimirReporte(id) {
   const r = obtenerDatos(KEY_REP).find(x => x.id === id);
   if (!r) return;
   const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, tipo: 'reporte' };
+  window._expedienteAlumno = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, folio: r.folio, tipo: 'reporte' };
   const html = `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}

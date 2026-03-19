@@ -155,7 +155,7 @@ function imprimirCitatorio(id) {
   const c = obtenerDatos(KEY_CIT).find(x => x.id === id);
   if (!c) return;
   const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, tipo: 'citatorio' };
+  window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
   const html = `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}

@@ -150,7 +150,7 @@ function imprimirPermiso(id) {
   const p = obtenerDatos(KEY_PERM).find(x => x.id === id);
   if (!p) return;
   const cfg = obtenerConfig();
-  window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, tipo: 'permiso' };
+  window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
   const html = `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
