@@ -150,6 +150,7 @@ function editarJustificante(id) {
 }
 
 function eliminarJustificante(id) {
+  if (!esAdmin()) { mostrarToast('Solo el administrador puede eliminar registros','error'); return; }
   if (!confirm('¿Eliminar este justificante?')) return;
   guardarDatos(KEY_JUST, obtenerDatos(KEY_JUST).filter(x => x.id !== id));
   if (window.sbDelete) window.sbDelete(KEY_JUST, id);

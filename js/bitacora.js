@@ -259,6 +259,7 @@ function verIncidente(id) {
 }
 
 function eliminarIncidente(id) {
+  if (!esAdmin()) { mostrarToast('Solo el administrador puede eliminar registros','error'); return; }
   if (!confirm('¿Eliminar este registro de la bitácora?')) return;
   guardarDatos(KEY_BIT, obtenerDatos(KEY_BIT).filter(x => x.id !== id));
   if (window.sbDelete) window.sbDelete(KEY_BIT, id);

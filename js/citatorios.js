@@ -148,6 +148,7 @@ function editarCitatorio(id) {
 }
 
 function eliminarCitatorio(id) {
+  if (!esAdmin()) { mostrarToast('Solo el administrador puede eliminar registros','error'); return; }
   if (!confirm('¿Eliminar este citatorio?')) return;
   guardarDatos(KEY_CIT, obtenerDatos(KEY_CIT).filter(x => x.id !== id));
   if (window.sbDelete) window.sbDelete(KEY_CIT, id);

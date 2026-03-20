@@ -143,6 +143,7 @@ function editarPermiso(id) {
 }
 
 function eliminarPermiso(id) {
+  if (!esAdmin()) { mostrarToast('Solo el administrador puede eliminar registros','error'); return; }
   if (!confirm('¿Eliminar este permiso?')) return;
   guardarDatos(KEY_PERM, obtenerDatos(KEY_PERM).filter(x => x.id !== id));
   if (window.sbDelete) window.sbDelete(KEY_PERM, id);

@@ -142,6 +142,7 @@ function editarReporte(id) {
 }
 
 function eliminarReporte(id) {
+  if (!esAdmin()) { mostrarToast('Solo el administrador puede eliminar registros','error'); return; }
   if (!confirm('¿Eliminar este reporte?')) return;
   guardarDatos(KEY_REP, obtenerDatos(KEY_REP).filter(x => x.id !== id));
   if (window.sbDelete) window.sbDelete(KEY_REP, id);

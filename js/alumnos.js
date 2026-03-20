@@ -38,8 +38,8 @@ function renderAlumnos(datos) {
       <td>
         <div class="btn-actions">
           <button class="btn-icon view" title="Ver Expediente" onclick="verExpediente('${a.id}')"><i class="fas fa-folder-open"></i></button>
-          <button class="btn-icon edit" title="Editar" onclick="editarAlumno('${a.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn-icon delete" title="Eliminar" onclick="eliminarAlumno('${a.id}')"><i class="fas fa-trash"></i></button>
+          ${esAdmin()?`<button class="btn-icon edit" title="Editar" onclick="editarAlumno('${a.id}')"><i class="fas fa-edit"></i></button>`:''}
+          ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarAlumno('${a.id}')"><i class="fas fa-trash"></i></button>`:''}
         </div>
       </td>
     </tr>`;
@@ -170,6 +170,7 @@ function editarAlumno(id) {
 }
 
 function eliminarAlumno(id) {
+  if (!esAdmin()) { mostrarToast('Solo el administrador puede eliminar alumnos','error'); return; }
   if (!confirm('¿Eliminar este alumno? No se eliminarán sus documentos existentes.')) return;
   guardarDatos(KEY_ALU, obtenerDatos(KEY_ALU).filter(x => x.id !== id));
   if (window.sbDelete) window.sbDelete(KEY_ALU, id);
@@ -476,8 +477,14 @@ async function generarExpedientePDF() {
 
 // ===== INIT =====
 function initAlumnos() {
-  document.getElementById('btn-nuevo-alumno').addEventListener('click', nuevoAlumno);
-  document.getElementById('btn-importar-csv').addEventListener('click', importarCSVAlumnos);
+  const btnNuevo = document.getElementById('btn-nuevo-alumno');
+  const btnImportar = document.getElementById('btn-importar-csv');
+  if (!esAdmin()) {
+    btnNuevo.style.display = 'none';
+    btnImportar.style.display = 'none';
+  }
+  btnNuevo.addEventListener('click', nuevoAlumno);
+  btnImportar.addEventListener('click', importarCSVAlumnos);
   filtrarTabla('search-alumnos', 'tbody-alumnos');
   renderAlumnos();
   refreshAlumnosCache();
