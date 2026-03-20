@@ -1,7 +1,7 @@
 // ===== MÓDULO REPORTES DE INDISCIPLINA =====
 
 const KEY_REP = 'reportes';
-const TIPOS_FALTA = ['Falta leve','Falta grave','Falta muy grave','Agresión verbal','Agresión física','Daño a la propiedad','Uso de teléfono','Acoso escolar (bullying)','Otra'];
+const TIPOS_FALTA = ['Falta leve','Falta grave','Falta muy grave','Agresión verbal','Agresión física','Daño a la propiedad','Uso de teléfono','Acoso escolar (bullying)','Inasistencia de clases','Otra'];
 const MEDIDAS = ['Llamada de atención verbal','Amonestación escrita','Citatorio a padres','Suspensión temporal','Canalización','Acta compromiso','Reporte a dirección','Otra'];
 
 function badgeFalta(tipo) {
