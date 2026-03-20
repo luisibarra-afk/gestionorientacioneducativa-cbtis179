@@ -65,9 +65,11 @@ function formularioJustificante(datos = {}) {
         <label>Validó</label>
         <input type="text" id="j-validador" class="form-control" value="${datos.validador || (getUsuarioActual()?.nombre || '')}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed">
       </div>
-      <div class="form-group form-full">
+      <div class="form-group">
         <label>Motivo de la Ausencia *</label>
-        <textarea id="j-motivo" class="form-control">${datos.motivo||''}</textarea>
+        <select id="j-motivo" class="form-control">
+          ${['Atención Médica / Reposo','Atención Médica / Cita','Personal / Familiar','Personal / Trámites'].map(m=>`<option ${datos.motivo===m?'selected':''}>${m}</option>`).join('')}
+        </select>
       </div>
       <div class="form-group form-full">
         <label>Observaciones</label>

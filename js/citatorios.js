@@ -55,10 +55,7 @@ function formularioCitatorio(datos = {}) {
       <div class="form-group"><label>Hora de la Cita</label>
         <input type="time" id="c-horaCita" class="form-control" value="${datos.horaCita||''}">
       </div>
-      <div class="form-group"><label>Emitido por</label>
-        <input type="text" id="c-emite" class="form-control" value="${datos.emite||''}" placeholder="Nombre de quien cita">
-      </div>
-      <div class="form-group"><label>Validó</label><input type="text" id="c-validador" class="form-control" value="${datos.validador || (getUsuarioActual()?.nombre || '')}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed"></div>
+<div class="form-group"><label>Validó</label><input type="text" id="c-validador" class="form-control" value="${datos.validador || (getUsuarioActual()?.nombre || '')}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed"></div>
       <div class="form-group"><label>Estado</label>
         <select id="c-estado" class="form-control">
           <option ${!datos.estado||datos.estado==='Pendiente'?'selected':''}>Pendiente</option>

@@ -78,12 +78,12 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('print-close').addEventListener('click', cerrarPrint);
   document.getElementById('print-cancel').addEventListener('click', cerrarPrint);
 
-  document.getElementById('modal-overlay').addEventListener('click', function (e) {
-    if (e.target === this) cerrarModal();
-  });
-  document.getElementById('print-overlay').addEventListener('click', function (e) {
-    if (e.target === this) cerrarPrint();
-  });
+  // Solo cerrar si mousedown Y mouseup ocurrieron sobre el overlay (no al soltar después de seleccionar texto)
+  let _mdModal = false, _mdPrint = false;
+  document.getElementById('modal-overlay').addEventListener('mousedown', function (e) { _mdModal = e.target === this; });
+  document.getElementById('modal-overlay').addEventListener('mouseup',   function (e) { if (_mdModal && e.target === this) cerrarModal(); _mdModal = false; });
+  document.getElementById('print-overlay').addEventListener('mousedown', function (e) { _mdPrint = e.target === this; });
+  document.getElementById('print-overlay').addEventListener('mouseup',   function (e) { if (_mdPrint && e.target === this) cerrarPrint(); _mdPrint = false; });
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') { cerrarModal(); cerrarPrint(); }

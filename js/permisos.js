@@ -60,10 +60,7 @@ function formularioPermiso(datos = {}) {
       <div class="form-group"><label>Teléfono del Padre/Tutor</label>
         <input type="tel" id="p-telefono" class="form-control" value="${datos.telefono||''}" placeholder="10 dígitos">
       </div>
-      <div class="form-group"><label>Autorizado por *</label>
-        <input type="text" id="p-autoriza" class="form-control" value="${datos.autoriza||''}" placeholder="Nombre de quien autoriza">
-      </div>
-      <div class="form-group"><label>Validó</label><input type="text" id="p-validador" class="form-control" value="${datos.validador || (getUsuarioActual()?.nombre || '')}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed"></div>
+<div class="form-group"><label>Validó</label><input type="text" id="p-validador" class="form-control" value="${datos.validador || (getUsuarioActual()?.nombre || '')}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed"></div>
       <div class="form-group form-full"><label>Motivo de la Salida *</label>
         <textarea id="p-motivo" class="form-control">${datos.motivo||''}</textarea>
       </div>
