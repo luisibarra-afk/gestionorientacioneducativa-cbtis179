@@ -5,37 +5,50 @@ function initAlumnoAutocomplete(inputId, onSelect) {
   const input = document.getElementById(inputId);
   if (!input) return;
 
-  // Crear dropdown
-  let dropdown = document.createElement('ul');
+  // Eliminar dropdown anterior si existía (re-inicialización al editar)
+  const old = document.getElementById(inputId + '-dropdown');
+  if (old) old.remove();
+
+  const dropdown = document.createElement('ul');
   dropdown.className = 'autocomplete-dropdown';
   dropdown.id = inputId + '-dropdown';
-  const wrapper = input.parentNode;
-  if (!wrapper.style.position) wrapper.style.position = 'relative';
-  wrapper.appendChild(dropdown);
+  dropdown.style.cssText = 'position:fixed;z-index:10000;';
+  document.body.appendChild(dropdown);
 
   let seleccionIdx = -1;
 
-  input.addEventListener('input', function () {
-    const q = this.value.trim().toLowerCase();
+  function posicionar() {
+    const rect = input.getBoundingClientRect();
+    dropdown.style.left  = rect.left + 'px';
+    dropdown.style.top   = (rect.bottom + 2) + 'px';
+    dropdown.style.width = rect.width + 'px';
+  }
+
+  function cerrar() {
     dropdown.innerHTML = '';
     seleccionIdx = -1;
+  }
+
+  input.addEventListener('input', function () {
+    const q = this.value.trim().toLowerCase();
+    cerrar();
     if (q.length < 1) return;
 
     const cache = window._alumnosCache || obtenerDatos('alumnos');
     const matches = cache.filter(a => {
-      const nombreComp = (a.nombre || '').toLowerCase();
-      const noCtrl = (a.noControl || '').toLowerCase();
-      const ap = (a.apellidoPaterno || '').toLowerCase();
-      const am = (a.apellidoMaterno || '').toLowerCase();
-      return nombreComp.includes(q) || noCtrl.includes(q) || ap.includes(q) || am.includes(q);
+      const nombre  = (a.nombre || '').toLowerCase();
+      const noCtrl  = (a.noControl || '').toLowerCase();
+      const ap      = (a.apellidoPaterno || '').toLowerCase();
+      const am      = (a.apellidoMaterno || '').toLowerCase();
+      return nombre.includes(q) || noCtrl.includes(q) || ap.includes(q) || am.includes(q);
     }).slice(0, 8);
 
     if (!matches.length) return;
+    posicionar();
 
-    matches.forEach((alumno, i) => {
+    matches.forEach((alumno) => {
       const li = document.createElement('li');
       li.className = 'autocomplete-item';
-      li.dataset.idx = i;
       const nombreMostrar = alumno.nombre ||
         [alumno.apellidoPaterno, alumno.apellidoMaterno, alumno.nombrePropio].filter(Boolean).join(' ');
       li.innerHTML = `<span class="ac-nombre">${nombreMostrar}</span>
@@ -44,13 +57,12 @@ function initAlumnoAutocomplete(inputId, onSelect) {
         e.preventDefault();
         onSelect(alumno);
         input.value = nombreMostrar;
-        dropdown.innerHTML = '';
+        cerrar();
       });
       dropdown.appendChild(li);
     });
   });
 
-  // Navegación con teclado
   input.addEventListener('keydown', function (e) {
     const items = dropdown.querySelectorAll('.autocomplete-item');
     if (!items.length) return;
@@ -65,13 +77,13 @@ function initAlumnoAutocomplete(inputId, onSelect) {
       items[seleccionIdx].dispatchEvent(new MouseEvent('mousedown'));
       return;
     } else if (e.key === 'Escape') {
-      dropdown.innerHTML = '';
+      cerrar();
       return;
     }
     items.forEach((it, i) => it.classList.toggle('active', i === seleccionIdx));
   });
 
   input.addEventListener('blur', () => {
-    setTimeout(() => { dropdown.innerHTML = ''; seleccionIdx = -1; }, 180);
+    setTimeout(() => cerrar(), 180);
   });
 }

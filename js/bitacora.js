@@ -35,7 +35,7 @@ function renderBitacora(datos) {
           <button class="btn-icon print" title="Vista previa / PDF" onclick="imprimirIncidente('${b.id}')"><i class="fas fa-file-pdf"></i></button>
           <button class="btn-icon ${b.driveSaved?'drive':'drive-pend'}" title="${b.driveSaved?'Guardado en Drive':'Guardar PDF en Drive'}" onclick="_driveBitPDF('${b.id}')"><i class="fab fa-google-drive"></i></button>
           <button class="btn-icon edit" title="Editar" onclick="editarIncidente('${b.id}')"><i class="fas fa-edit"></i></button>
-          <button class="btn-icon delete" title="Eliminar" onclick="eliminarIncidente('${b.id}')"><i class="fas fa-trash"></i></button>
+          ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarIncidente('${b.id}')"><i class="fas fa-trash"></i></button>`:''}
         </div>
       </td>
     </tr>`).join('');

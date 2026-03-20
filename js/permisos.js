@@ -18,7 +18,7 @@ function renderPermisos(datos) {
         <button class="btn-icon print" title="PDF" onclick="imprimirPermiso('${p.id}')"><i class="fas fa-file-pdf"></i></button>
         <button class="btn-icon ${p.driveSaved?'drive':'drive-pend'}" title="${p.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_drivePermiso('${p.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarPermiso('${p.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn-icon delete" title="Eliminar" onclick="eliminarPermiso('${p.id}')"><i class="fas fa-trash"></i></button>
+        ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarPermiso('${p.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
     </tr>`).join('');
 }

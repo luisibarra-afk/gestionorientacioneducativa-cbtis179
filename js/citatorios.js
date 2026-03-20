@@ -19,7 +19,7 @@ function renderCitatorios(datos) {
         <button class="btn-icon print" title="PDF" onclick="imprimirCitatorio('${c.id}')"><i class="fas fa-file-pdf"></i></button>
         <button class="btn-icon ${c.driveSaved?'drive':'drive-pend'}" title="${c.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveCitatorio('${c.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarCitatorio('${c.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn-icon delete" title="Eliminar" onclick="eliminarCitatorio('${c.id}')"><i class="fas fa-trash"></i></button>
+        ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarCitatorio('${c.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
     </tr>`).join('');
 }

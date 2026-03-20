@@ -18,7 +18,7 @@ function renderJustificantes(datos) {
         <button class="btn-icon print" title="PDF" onclick="imprimirJustificante('${j.id}')"><i class="fas fa-file-pdf"></i></button>
         <button class="btn-icon ${j.driveSaved?'drive':'drive-pend'}" title="${j.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveJustificante('${j.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarJustificante('${j.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn-icon delete" title="Eliminar" onclick="eliminarJustificante('${j.id}')"><i class="fas fa-trash"></i></button>
+        ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarJustificante('${j.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
     </tr>`).join('');
 }

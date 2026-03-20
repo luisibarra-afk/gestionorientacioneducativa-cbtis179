@@ -57,6 +57,7 @@ function abrirModal(titulo, htmlContent, onSave) {
 function cerrarModal() {
   document.getElementById('modal-overlay').classList.add('hidden');
   document.getElementById('modal-save').style.display = '';
+  document.querySelectorAll('.autocomplete-dropdown').forEach(d => d.remove());
 }
 
 // ======= PDF / IMPRESIÓN =======

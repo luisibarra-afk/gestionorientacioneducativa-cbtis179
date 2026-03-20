@@ -29,7 +29,7 @@ function renderReportes(datos) {
         <button class="btn-icon print" title="PDF" onclick="imprimirReporte('${r.id}')"><i class="fas fa-file-pdf"></i></button>
         <button class="btn-icon ${r.driveSaved?'drive':'drive-pend'}" title="${r.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveReporte('${r.id}')"><i class="fab fa-google-drive"></i></button>
         <button class="btn-icon edit" title="Editar" onclick="editarReporte('${r.id}')"><i class="fas fa-edit"></i></button>
-        <button class="btn-icon delete" title="Eliminar" onclick="eliminarReporte('${r.id}')"><i class="fas fa-trash"></i></button>
+        ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarReporte('${r.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
     </tr>`).join('');
 }
