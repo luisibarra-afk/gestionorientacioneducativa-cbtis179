@@ -81,21 +81,26 @@ window.guardarPDFEnDrive = async function(blob, alumno) {
     const cfg = typeof obtenerConfig === 'function' ? obtenerConfig() : {};
     const ciclo = cfg.ciclo || '2025-2026';
 
-    // Nombre del alumno: APELLIDO PATERNO APELLIDO MATERNO NOMBRE(S)
-    // Buscar en caché para obtener apellidos separados
-    const cache = window._alumnosCache || [];
-    const aluCompleto = cache.find(a => a.noControl && a.noControl === alumno.noControl) || {};
-    const apPat    = (aluCompleto.apellidoPaterno || '').toUpperCase().trim();
-    const apMat    = (aluCompleto.apellidoMaterno || '').toUpperCase().trim();
-    const nomProp  = (aluCompleto.nombrePropio || '').toUpperCase().trim();
-    // Si no hay datos en caché, usar el nombre completo tal cual
-    const nombreCarpeta = limpiarNombre(
-      [apPat, apMat, nomProp].filter(Boolean).join(' ') || (alumno.nombre || 'SIN-NOMBRE').toUpperCase()
-    );
+    let dirRaiz, dirAlu, nombreCarpeta;
 
-    // Estructura: Expedientes [ciclo] / [NOMBRE ALUMNO]
-    const dirRaiz = await _driveHandle.getDirectoryHandle(`Expedientes ${ciclo}`, { create: true });
-    const dirAlu  = await dirRaiz.getDirectoryHandle(nombreCarpeta, { create: true });
+    if (alumno.carpetaRaiz) {
+      // Carpeta personalizada (ej. Visitas en el Aula)
+      dirRaiz = await _driveHandle.getDirectoryHandle(limpiarNombre(alumno.carpetaRaiz), { create: true });
+      nombreCarpeta = limpiarNombre(alumno.subcarpeta || alumno.nombre || 'SIN_GRUPO');
+      dirAlu = await dirRaiz.getDirectoryHandle(nombreCarpeta, { create: true });
+    } else {
+      // Estructura estándar: Expedientes [ciclo] / [NOMBRE ALUMNO]
+      const cache = window._alumnosCache || [];
+      const aluCompleto = cache.find(a => a.noControl && a.noControl === alumno.noControl) || {};
+      const apPat    = (aluCompleto.apellidoPaterno || '').toUpperCase().trim();
+      const apMat    = (aluCompleto.apellidoMaterno || '').toUpperCase().trim();
+      const nomProp  = (aluCompleto.nombrePropio || '').toUpperCase().trim();
+      nombreCarpeta = limpiarNombre(
+        [apPat, apMat, nomProp].filter(Boolean).join(' ') || (alumno.nombre || 'SIN-NOMBRE').toUpperCase()
+      );
+      dirRaiz = await _driveHandle.getDirectoryHandle(`Expedientes ${ciclo}`, { create: true });
+      dirAlu  = await dirRaiz.getDirectoryHandle(nombreCarpeta, { create: true });
+    }
 
     // Nombre del archivo: TIPO_FOLIO_FECHA.pdf
     const fecha    = new Date().toISOString().slice(0, 10);

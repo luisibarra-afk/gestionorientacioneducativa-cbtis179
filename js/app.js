@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initCitatorios();
   initReportes();
   initBitacora();
+  initVisitas();
   initAlumnos();
   if (usuario.rol === 'admin') cargarFormConfig();
   actualizarStats();
@@ -96,6 +97,7 @@ const PAGE_TITLES = {
   citatorios: 'Citatorios',
   reportes: 'Reportes de Indisciplina',
   bitacora: 'Bitácora de Seguridad',
+  visitas: 'Visitas en el Aula',
   alumnos: 'Alumnos / Padrón',
   expediente: 'Expediente del Alumno',
   configuracion: 'Configuración'

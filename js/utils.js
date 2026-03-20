@@ -144,12 +144,12 @@ function exportarCSV(modulo) {
 }
 
 function exportarTodo() {
-  ['justificantes','permisos','citatorios','reportes','bitacora','alumnos'].forEach((m,i) => setTimeout(() => exportarCSV(m), i*300));
+  ['justificantes','permisos','citatorios','reportes','bitacora','visitas','alumnos'].forEach((m,i) => setTimeout(() => exportarCSV(m), i*300));
 }
 
 function confirmarBorrar() {
   if (confirm('¿Borrar TODOS los datos locales? Esta acción no se puede deshacer.')) {
-    ['justificantes','permisos','citatorios','reportes','bitacora','alumnos','actividad','folios'].forEach(k => localStorage.removeItem(k));
+    ['justificantes','permisos','citatorios','reportes','bitacora','visitas','alumnos','actividad','folios'].forEach(k => localStorage.removeItem(k));
     mostrarToast('Datos borrados');
     setTimeout(() => location.reload(), 1000);
   }
@@ -246,7 +246,7 @@ async function guardarDocEnDrive(htmlContent, expediente) {
 window.addEventListener('beforeunload', function(e) {
   const driveOn = document.getElementById('drive-status')?.classList.contains('status-on');
   if (!driveOn) return;
-  const pending = ['justificantes','permisos','citatorios','reportes']
+  const pending = ['justificantes','permisos','citatorios','reportes','visitas']
     .some(k => obtenerDatos(k).some(r => !r.driveSaved));
   if (pending) { e.preventDefault(); e.returnValue = ''; }
 });
