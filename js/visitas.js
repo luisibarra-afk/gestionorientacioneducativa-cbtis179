@@ -30,7 +30,7 @@ function formularioVisita(datos = {}) {
   return `
     <div class="form-grid">
       <div class="form-group"><label>Fecha *</label>
-        <input type="date" id="v-fecha" class="form-control" value="${datos.fecha||hoy()}">
+        <input type="date" id="v-fecha" class="form-control" value="${datos.fecha||fechaHoy()}">
       </div>
       <div class="form-group"><label>Turno</label>
         <select id="v-turno" class="form-control">
@@ -115,7 +115,9 @@ function nuevaVisita() {
     const grupo = document.getElementById('v-grupo').value.trim();
     const tema  = document.getElementById('v-tema').value.trim();
     const desc  = document.getElementById('v-descripcion').value.trim();
-    if (!grupo || !tema || !desc) { mostrarToast('Completa Grupo, Tema y Descripción','error'); return false; }
+    if (!grupo || !tema || !desc) { mostrarToast('Completa Grupo, Tema y Descripción','error'); return; }
+    const btn = document.getElementById('modal-save');
+    btn.disabled = true; btn.textContent = 'Guardando...';
     _leerFotos(null, null, function(foto1, foto2) {
       const nuevo = {
         id: genId(),
@@ -133,7 +135,6 @@ function nuevaVisita() {
       cerrarModal();
       _driveVisita(nuevo.id);
     });
-    return false; // Evitar cierre inmediato (cerramos desde callback)
   });
 }
 
@@ -146,6 +147,8 @@ function editarVisita(id) {
     const tema  = document.getElementById('v-tema').value.trim();
     const desc  = document.getElementById('v-descripcion').value.trim();
     if (!grupo || !tema || !desc) { mostrarToast('Completa Grupo, Tema y Descripción','error'); return false; }
+    const btn = document.getElementById('modal-save');
+    btn.disabled = true; btn.textContent = 'Guardando...';
     _leerFotos(v.foto1, v.foto2, function(foto1, foto2) {
       Object.assign(v, _leerFormVisita(foto1, foto2));
       guardarDatos(KEY_VIS, datos);
@@ -154,7 +157,6 @@ function editarVisita(id) {
       renderVisitas();
       cerrarModal();
     });
-    return false;
   });
 }
 
@@ -223,7 +225,7 @@ function _htmlVisita(v) {
 function imprimirVisita(id) {
   const v = obtenerDatos(KEY_VIS).find(x => x.id === id);
   if (!v) return;
-  abrirPrint(_htmlVisita(v));
+  abrirPrint(`Visita ${v.folio}`, _htmlVisita(v));
 }
 
 // ===== GUARDAR EN DRIVE =====
@@ -277,7 +279,7 @@ function verExpedienteGrupo(grupoEnc) {
         </div>`).join('')}
       ${membreteFooter(cfg)}
     </div>`;
-  abrirPrint(html);
+  abrirPrint(`Expediente Grupo ${grupo}`, html);
 }
 
 // ===== INIT =====
