@@ -86,6 +86,23 @@ function _wrapMediaHoja(innerHtml) {
     </div>`;
 }
 
+function imprimirVentana() {
+  const el = document.getElementById('doc-to-pdf');
+  if (!el) return;
+  const win = window.open('', '_blank', 'width=900,height=700');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
+    <title>Imprimir</title>
+    <style>
+      @page { margin: 8mm; }
+      body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+      * { box-sizing: border-box; }
+    </style>
+    <link rel="stylesheet" href="${location.origin}${location.pathname.replace(/[^/]*$/, '')}css/styles.css">
+  </head><body>${el.outerHTML}</body></html>`);
+  win.document.close();
+  win.onload = function() { win.focus(); win.print(); win.close(); };
+}
+
 function abrirPrint(titulo, htmlContent) {
   _pdfTituloActual = titulo;
   document.getElementById('print-title').textContent = titulo;
