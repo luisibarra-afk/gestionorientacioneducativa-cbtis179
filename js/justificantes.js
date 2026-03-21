@@ -159,10 +159,10 @@ function eliminarJustificante(id) {
   renderJustificantes(); actualizarStats(); mostrarToast('Justificante eliminado');
 }
 
-function _htmlDocJust(j, cfg, sinPie = false) {
+function _htmlDocJust(j, cfg, sinPie = false, sinEncabezado = false) {
   return `
-    <div class="doc-preview" id="doc-to-pdf">
-      ${membreteHeader(cfg)}
+    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:8px':''}">
+      ${sinEncabezado ? '' : membreteHeader(cfg)}
       <div class="doc-tipo-titulo">Justificante de Inasistencia</div>
       <div class="doc-ciclo">Ciclo Escolar ${cfg.ciclo}</div>
       <div class="doc-folio-row">
@@ -196,7 +196,7 @@ function imprimirJustificante(id) {
   if (!j) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
-  abrirPrint(`Justificante ${j.folio||j.id}`, _wrapMediaHoja(_htmlDocJust(j, cfg, true)));
+  abrirPrint(`Justificante ${j.folio||j.id}`, _wrapMediaHoja(_htmlDocJust(j, cfg, true, true)));
 }
 
 async function _driveJustificante(id) {

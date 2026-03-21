@@ -69,8 +69,8 @@ function _wrapMediaHoja(innerHtml) {
   return `
     <div id="doc-to-pdf" data-halfpage="true"
          style="width:794px;height:555px;overflow:hidden;background:#fff;
-                font-family:Arial,sans-serif;display:flex;flex-direction:column">
-      <div style="flex:1;overflow:hidden">${inner}</div>
+                font-family:Arial,sans-serif;display:flex;flex-direction:column;margin:0;padding:0">
+      <div style="flex:1;overflow:hidden;margin:0;padding:0">${inner}</div>
       <div style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 10px;
                   background:#f8fafc;border-top:2px dashed #94a3b8;border-bottom:2px dashed #94a3b8;
                   color:#94a3b8;font-size:10px;letter-spacing:3px;user-select:none">

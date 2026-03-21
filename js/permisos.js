@@ -147,10 +147,10 @@ function eliminarPermiso(id) {
   renderPermisos(); actualizarStats(); mostrarToast('Permiso eliminado');
 }
 
-function _htmlDocPerm(p, cfg, sinPie = false) {
+function _htmlDocPerm(p, cfg, sinPie = false, sinEncabezado = false) {
   return `
-    <div class="doc-preview" id="doc-to-pdf">
-      ${membreteHeader(cfg)}
+    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:8px':''}">
+      ${sinEncabezado ? '' : membreteHeader(cfg)}
       <div class="doc-tipo-titulo">Permiso de Salida</div>
       <div class="doc-ciclo">Ciclo Escolar ${cfg.ciclo}</div>
       <div class="doc-folio-row">
@@ -184,7 +184,7 @@ function imprimirPermiso(id) {
   if (!p) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
-  abrirPrint(`Permiso ${p.folio||p.id}`, _wrapMediaHoja(_htmlDocPerm(p, cfg, true)));
+  abrirPrint(`Permiso ${p.folio||p.id}`, _wrapMediaHoja(_htmlDocPerm(p, cfg, true, true)));
 }
 
 async function _drivePermiso(id) {
