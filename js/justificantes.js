@@ -159,7 +159,7 @@ function eliminarJustificante(id) {
   renderJustificantes(); actualizarStats(); mostrarToast('Justificante eliminado');
 }
 
-function _htmlDocJust(j, cfg) {
+function _htmlDocJust(j, cfg, sinPie = false) {
   return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
@@ -187,7 +187,7 @@ function _htmlDocJust(j, cfg) {
         <div class="signature-box"><div class="sig-line"></div><p>${j.validador||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Orientación Educativa</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>${j.tutor||'Padre / Tutor'}</p><small>Firma de conformidad</small></div>
       </div>
-      ${membreteFooter(cfg)}
+      ${sinPie ? '' : membreteFooter(cfg)}
     </div>`;
 }
 
@@ -196,7 +196,7 @@ function imprimirJustificante(id) {
   if (!j) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
-  abrirPrint(`Justificante ${j.folio||j.id}`, _wrapMediaHoja(_htmlDocJust(j, cfg)));
+  abrirPrint(`Justificante ${j.folio||j.id}`, _wrapMediaHoja(_htmlDocJust(j, cfg, true)));
 }
 
 async function _driveJustificante(id) {

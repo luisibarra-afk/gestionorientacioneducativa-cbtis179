@@ -152,7 +152,7 @@ function eliminarCitatorio(id) {
   renderCitatorios(); actualizarStats(); mostrarToast('Citatorio eliminado');
 }
 
-function _htmlDocCit(c, cfg) {
+function _htmlDocCit(c, cfg, sinPie = false) {
   return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
@@ -180,7 +180,7 @@ function _htmlDocCit(c, cfg) {
         <div class="signature-box"><div class="sig-line"></div><p>${c.emite||c.validador||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Orientación Educativa</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>${c.tutor}</p><small>Firma de recibido</small></div>
       </div>
-      ${membreteFooter(cfg)}
+      ${sinPie ? '' : membreteFooter(cfg)}
     </div>`;
 }
 
@@ -189,7 +189,7 @@ function imprimirCitatorio(id) {
   if (!c) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
-  abrirPrint(`Citatorio ${c.folio||c.id}`, _wrapMediaHoja(_htmlDocCit(c, cfg)));
+  abrirPrint(`Citatorio ${c.folio||c.id}`, _wrapMediaHoja(_htmlDocCit(c, cfg, true)));
 }
 
 async function _driveCitatorio(id) {

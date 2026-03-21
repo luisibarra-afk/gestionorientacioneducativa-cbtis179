@@ -147,7 +147,7 @@ function eliminarPermiso(id) {
   renderPermisos(); actualizarStats(); mostrarToast('Permiso eliminado');
 }
 
-function _htmlDocPerm(p, cfg) {
+function _htmlDocPerm(p, cfg, sinPie = false) {
   return `
     <div class="doc-preview" id="doc-to-pdf">
       ${membreteHeader(cfg)}
@@ -175,7 +175,7 @@ function _htmlDocPerm(p, cfg) {
         <div class="signature-box"><div class="sig-line"></div><p>${p.validador||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Orientación Educativa</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>${p.persona||'Padre / Tutor'}</p><small>Firma de quien recoge</small></div>
       </div>
-      ${membreteFooter(cfg)}
+      ${sinPie ? '' : membreteFooter(cfg)}
     </div>`;
 }
 
@@ -184,7 +184,7 @@ function imprimirPermiso(id) {
   if (!p) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
-  abrirPrint(`Permiso ${p.folio||p.id}`, _wrapMediaHoja(_htmlDocPerm(p, cfg)));
+  abrirPrint(`Permiso ${p.folio||p.id}`, _wrapMediaHoja(_htmlDocPerm(p, cfg, true)));
 }
 
 async function _drivePermiso(id) {

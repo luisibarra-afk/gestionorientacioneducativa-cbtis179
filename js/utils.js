@@ -63,13 +63,15 @@ function cerrarModal() {
 // ======= PDF / IMPRESIÓN =======
 let _pdfTituloActual = '';
 
-// Agrega línea de corte al final del documento (media hoja)
+// Envuelve un documento en media hoja A4 (sin pie de página) con línea de corte
 function _wrapMediaHoja(innerHtml) {
   const inner = innerHtml.replace(/\bid="doc-to-pdf"/g, '');
   return `
-    <div id="doc-to-pdf" style="width:794px;background:#fff;font-family:Arial,sans-serif">
-      ${inner}
-      <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;margin-top:8px;
+    <div id="doc-to-pdf" data-halfpage="true"
+         style="width:794px;height:555px;overflow:hidden;background:#fff;
+                font-family:Arial,sans-serif;display:flex;flex-direction:column">
+      <div style="flex:1;overflow:hidden">${inner}</div>
+      <div style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 10px;
                   background:#f8fafc;border-top:2px dashed #94a3b8;border-bottom:2px dashed #94a3b8;
                   color:#94a3b8;font-size:10px;letter-spacing:3px;user-select:none">
         <span style="font-size:13px">✂</span>
@@ -117,12 +119,12 @@ async function descargarPDFActual() {
     });
     document.body.removeChild(clone);
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const isHalf = el.dataset.halfpage === 'true';
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: isHalf ? [210, 148] : 'a4' });
     const pdfW = pdf.internal.pageSize.getWidth();
-    const a4H = pdf.internal.pageSize.getHeight();
+    const pdfH = pdf.internal.pageSize.getHeight();
     const imgData = canvas.toDataURL('image/png');
-    // Siempre ajustar a una sola hoja A4
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfW, a4H);
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
     const nombre = _pdfTituloActual.replace(/[^a-zA-Z0-9\-_áéíóúÁÉÍÓÚñÑ ]/g, '') || 'documento';
     pdf.save(`${nombre}.pdf`);
     // Guardar en Drive si está conectado
