@@ -154,15 +154,15 @@ function eliminarCitatorio(id) {
 
 function _htmlDocCit(c, cfg, sinPie = false, sinEncabezado = false) {
   return `
-    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:8px':''}">
+    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:6px;padding-bottom:4px':''}">
       ${sinEncabezado ? '' : membreteHeader(cfg)}
-      <div class="doc-tipo-titulo">Citatorio</div>
-      <div class="doc-ciclo">Ciclo Escolar ${cfg.ciclo}</div>
-      <div class="doc-folio-row">
+      <div class="doc-tipo-titulo" style="${sinEncabezado?'margin-bottom:1px':''}">Citatorio</div>
+      <div class="doc-ciclo" style="${sinEncabezado?'margin-bottom:6px':''}">Ciclo Escolar ${cfg.ciclo}</div>
+      <div class="doc-folio-row" style="${sinEncabezado?'margin-bottom:8px':''}">
         <span class="folio-label">FOLIO: <strong>${c.folio||c.id.toUpperCase()}</strong></span>
         <span class="folio-fecha">Emitido: ${formatFecha(c.fechaCreacion)}</span>
       </div>
-      <div class="doc-body">
+      <div class="doc-body" style="${sinEncabezado?'font-size:12.5px;line-height:1.6':''}">
         <p>Se cita al señor(a) <strong>${c.tutor}</strong>, padre/madre/tutor del(la) alumno(a):</p>
         <p class="doc-highlight"><strong>${c.alumno}</strong> &nbsp;|&nbsp; <strong>${c.grado} Sem. — ${c.grupo}</strong>${c.especialidad?'&nbsp;|&nbsp; Esp: <strong>'+c.especialidad+'</strong>':''}${c.noControl?'&nbsp;|&nbsp; No. Control: <strong>'+c.noControl+'</strong>':''}</p>
         ${c.telefonoTutor?`<p>Teléfono del padre/tutor: <strong>${c.telefonoTutor}</strong></p>`:''}
@@ -171,12 +171,12 @@ function _htmlDocCit(c, cfg, sinPie = false, sinEncabezado = false) {
         <p>Se solicita puntual asistencia.</p>
         ${c.acuerdos?`<hr style="margin:16px 0;border-color:#ccc"><p><strong>Acuerdos:</strong> ${c.acuerdos}</p>`:''}
       </div>
-      <div class="doc-validation-seal"><div class="seal-box">
+      <div class="doc-validation-seal" style="margin:8px 0 4px"><div class="seal-box">
         <div class="seal-title">VALIDÓ</div>
         <div class="seal-name">${c.validador||'________________________'}</div>
         <div class="seal-role">Orientación Educativa</div>
       </div></div>
-      <div class="doc-signature">
+      <div class="doc-signature" style="margin-top:10px">
         <div class="signature-box"><div class="sig-line"></div><p>${c.emite||c.validador||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Orientación Educativa</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>${c.tutor}</p><small>Firma de recibido</small></div>
       </div>

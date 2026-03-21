@@ -45,13 +45,13 @@ function formularioJustificante(datos = {}) {
         <label>Especialidad</label>
         <input type="text" id="j-especialidad" class="form-control" value="${datos.especialidad||''}" placeholder="Administración, Informática...">
       </div>
-      <div class="form-group">
-        <label>Fecha de Ausencia *</label>
-        <input type="date" id="j-fechaAusencia" class="form-control" value="${datos.fechaAusencia||fechaHoy()}">
+      <div class="form-group form-full">
+        <label>Fecha(s) de Ausencia * <small style="color:#64748b;font-weight:400">(separa con coma si son varios días: 10/03/2026, 11/03/2026)</small></label>
+        <input type="text" id="j-fechaAusencia" class="form-control" value="${datos.fechaAusencia||''}" placeholder="Ej: 10/03/2026  o  10/03/2026, 11/03/2026">
       </div>
       <div class="form-group">
         <label>Fecha de Expedición</label>
-        <input type="date" id="j-fechaExpedicion" class="form-control" value="${datos.fechaExpedicion||fechaHoy()}">
+        <input type="text" id="j-fechaExpedicion" class="form-control" value="${formatFecha(fechaHoy())}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed">
       </div>
       <div class="form-group">
         <label>Padre / Tutor</label>
@@ -91,7 +91,7 @@ function nuevoJustificante() {
       grupo: document.getElementById('j-grupo').value.trim().toUpperCase(),
       especialidad: document.getElementById('j-especialidad').value.trim(),
       fechaAusencia: document.getElementById('j-fechaAusencia').value,
-      fechaExpedicion: document.getElementById('j-fechaExpedicion').value,
+      fechaExpedicion: fechaHoy(),
       tutor: document.getElementById('j-tutor').value.trim(),
       telefonoTutor: document.getElementById('j-telefono').value.trim(),
       validador: document.getElementById('j-validador').value,
@@ -128,7 +128,6 @@ function editarJustificante(id) {
     item.grupo = document.getElementById('j-grupo').value.trim().toUpperCase();
     item.especialidad = document.getElementById('j-especialidad').value.trim();
     item.fechaAusencia = document.getElementById('j-fechaAusencia').value;
-    item.fechaExpedicion = document.getElementById('j-fechaExpedicion').value;
     item.tutor = document.getElementById('j-tutor').value.trim();
     item.telefonoTutor = document.getElementById('j-telefono').value.trim();
     item.validador = document.getElementById('j-validador').value;
@@ -172,7 +171,7 @@ function _htmlDocJust(j, cfg, sinPie = false, sinEncabezado = false) {
       <div class="doc-body" style="${sinEncabezado?'font-size:12.5px;line-height:1.6':''}">
         <p>El que suscribe, personal de Orientación Educativa, hace constar que el(la) alumno(a):</p>
         <p class="doc-highlight"><strong>${j.alumno}</strong> &nbsp;|&nbsp; <strong>${j.grado} Sem. — ${j.grupo}</strong>${j.especialidad?'&nbsp;|&nbsp; Esp: <strong>'+j.especialidad+'</strong>':''}${j.noControl?'&nbsp;|&nbsp; No. Control: <strong>'+j.noControl+'</strong>':''}</p>
-        <p>No asistió a clases el día <strong>${formatFecha(j.fechaAusencia)}</strong>, por el siguiente motivo:</p>
+        <p>No asistió a clases el día(s) <strong>${j.fechaAusencia}</strong>, por el siguiente motivo:</p>
         <p class="doc-motivo">"${j.motivo}"</p>
         ${j.tutor?`<p>Entregado por: <strong>${j.tutor}</strong>${j.telefonoTutor?' &nbsp; Tel: <strong>'+j.telefonoTutor+'</strong>':''}</p>`:''}
         ${j.observaciones?`<p><em>Obs: ${j.observaciones}</em></p>`:''}
