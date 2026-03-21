@@ -63,14 +63,13 @@ function cerrarModal() {
 // ======= PDF / IMPRESIÓN =======
 let _pdfTituloActual = '';
 
-// Envuelve el HTML de un documento en dos copias (media hoja) con línea de corte
+// Agrega línea de corte al final del documento (media hoja)
 function _wrapMediaHoja(innerHtml) {
-  // Quita el id="doc-to-pdf" del interior para evitar IDs duplicados
   const inner = innerHtml.replace(/\bid="doc-to-pdf"/g, '');
   return `
     <div id="doc-to-pdf" style="width:794px;background:#fff;font-family:Arial,sans-serif">
-      <div style="max-height:548px;overflow:hidden">${inner}</div>
-      <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;
+      ${inner}
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;margin-top:8px;
                   background:#f8fafc;border-top:2px dashed #94a3b8;border-bottom:2px dashed #94a3b8;
                   color:#94a3b8;font-size:10px;letter-spacing:3px;user-select:none">
         <span style="font-size:13px">✂</span>
