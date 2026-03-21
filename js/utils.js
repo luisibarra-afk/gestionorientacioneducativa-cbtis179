@@ -63,15 +63,18 @@ function cerrarModal() {
 // ======= PDF / IMPRESIÓN =======
 let _pdfTituloActual = '';
 
-// Envuelve un documento en media hoja A4 (sin pie de página) con línea de corte
+// Envuelve un documento en media hoja con línea de corte
 function _wrapMediaHoja(innerHtml) {
-  const inner = innerHtml.replace(/\bid="doc-to-pdf"/g, '');
+  // Reemplazar el div .doc-preview para que no tenga padding ni centrado que cause espacio
+  const inner = innerHtml
+    .replace(/\bid="doc-to-pdf"/g, '')
+    .replace(/class="doc-preview"[^>]*>/,
+      'style="font-family:Times New Roman,serif;width:100%;padding:12px 28px 8px;background:#fff;color:#111;box-sizing:border-box">');
   return `
-    <div id="doc-to-pdf" data-halfpage="true"
-         style="width:794px;height:555px;overflow:hidden;background:#fff;
-                font-family:Arial,sans-serif;display:flex;flex-direction:column;margin:0;padding:0">
-      <div style="flex:1;overflow:hidden;margin:0;padding:0">${inner}</div>
-      <div style="flex-shrink:0;display:flex;align-items:center;gap:6px;padding:4px 10px;
+    <div id="doc-to-pdf" data-halfpage="1"
+         style="width:794px;background:#fff;font-family:Arial,sans-serif">
+      ${inner}
+      <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;margin-top:6px;
                   background:#f8fafc;border-top:2px dashed #94a3b8;border-bottom:2px dashed #94a3b8;
                   color:#94a3b8;font-size:10px;letter-spacing:3px;user-select:none">
         <span style="font-size:13px">✂</span>
@@ -119,12 +122,18 @@ async function descargarPDFActual() {
     });
     document.body.removeChild(clone);
     const { jsPDF } = window.jspdf;
-    const isHalf = el.dataset.halfpage === 'true';
-    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: isHalf ? [210, 148] : 'a4' });
+    const isHalf = el.dataset.halfpage === '1';
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     const pdfW = pdf.internal.pageSize.getWidth();
-    const pdfH = pdf.internal.pageSize.getHeight();
+    const a4H  = pdf.internal.pageSize.getHeight();
     const imgData = canvas.toDataURL('image/png');
-    pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+    if (isHalf) {
+      // Colocar imagen solo en la mitad superior de A4; el resto queda en blanco para recortar
+      const imgH = (canvas.height / canvas.width) * pdfW;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, Math.min(imgH, a4H / 2));
+    } else {
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, a4H);
+    }
     const nombre = _pdfTituloActual.replace(/[^a-zA-Z0-9\-_áéíóúÁÉÍÓÚñÑ ]/g, '') || 'documento';
     pdf.save(`${nombre}.pdf`);
     // Guardar en Drive si está conectado
