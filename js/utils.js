@@ -90,17 +90,34 @@ function imprimirVentana() {
   const el = document.getElementById('doc-to-pdf');
   if (!el) return;
   const win = window.open('', '_blank', 'width=900,height=700');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
-    <title>Imprimir</title>
-    <style>
-      @page { margin: 8mm; }
-      body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
-      * { box-sizing: border-box; }
-    </style>
-    <link rel="stylesheet" href="${location.origin}${location.pathname.replace(/[^/]*$/, '')}css/styles.css">
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Imprimir</title>
+  <style>
+    @page { margin: 8mm; }
+    *{ box-sizing:border-box; }
+    body{ margin:0; padding:0; background:#fff; font-family:'Times New Roman',serif; color:#111; }
+    .doc-tipo-titulo{ font-size:18px; font-weight:900; text-transform:uppercase; letter-spacing:3px; text-align:center; color:#1e293b; margin-bottom:2px; }
+    .doc-ciclo{ font-size:12px; color:#64748b; text-align:center; margin-bottom:14px; }
+    .doc-folio-row{ display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:5px; padding:7px 14px; margin-bottom:18px; font-size:13px; }
+    .folio-label{ font-family:'Courier New',monospace; font-size:13px; }
+    .folio-fecha{ color:#475569; font-size:12px; }
+    .doc-body{ font-size:13px; line-height:1.9; }
+    .doc-body p{ margin-bottom:10px; text-align:justify; }
+    .doc-highlight{ background:#f0f9ff; border-left:4px solid #2563eb; padding:8px 14px; border-radius:4px; font-size:14px; margin:12px 0; }
+    .doc-motivo{ background:#fffbeb; border-left:4px solid #f59e0b; padding:8px 14px; border-radius:4px; font-style:italic; }
+    .doc-validation-seal{ display:flex; justify-content:flex-end; margin:20px 0 10px; }
+    .seal-box{ border:2px solid #1e293b; border-radius:8px; padding:10px 20px; text-align:center; min-width:220px; background:#f8fafc; }
+    .seal-title{ font-size:10px; font-weight:900; text-transform:uppercase; letter-spacing:3px; color:#64748b; }
+    .seal-name{ font-size:14px; font-weight:bold; color:#1e293b; margin-top:4px; }
+    .seal-role{ font-size:11px; color:#64748b; margin-top:2px; }
+    .doc-signature{ display:flex; justify-content:space-around; margin-top:24px; flex-wrap:wrap; gap:20px; }
+    .signature-box{ text-align:center; min-width:160px; }
+    .sig-line{ border-top:1px solid #1e293b; margin-bottom:8px; }
+    .signature-box p{ font-size:12px; font-weight:bold; }
+    .signature-box small{ font-size:11px; color:#64748b; }
+  </style>
   </head><body>${el.outerHTML}</body></html>`);
   win.document.close();
-  win.onload = function() { win.focus(); win.print(); win.close(); };
+  setTimeout(function(){ win.focus(); win.print(); win.close(); }, 600);
 }
 
 function abrirPrint(titulo, htmlContent) {
