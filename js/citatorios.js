@@ -189,7 +189,7 @@ function imprimirCitatorio(id) {
   if (!c) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
-  abrirPrint(`Citatorio ${c.folio||c.id}`, _htmlDocCit(c, cfg));
+  abrirPrint(`Citatorio ${c.folio||c.id}`, _wrapMediaHoja(_htmlDocCit(c, cfg)));
 }
 
 async function _driveCitatorio(id) {

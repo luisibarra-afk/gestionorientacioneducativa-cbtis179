@@ -196,7 +196,7 @@ function imprimirJustificante(id) {
   if (!j) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
-  abrirPrint(`Justificante ${j.folio||j.id}`, _htmlDocJust(j, cfg));
+  abrirPrint(`Justificante ${j.folio||j.id}`, _wrapMediaHoja(_htmlDocJust(j, cfg)));
 }
 
 async function _driveJustificante(id) {

@@ -184,7 +184,7 @@ function imprimirPermiso(id) {
   if (!p) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
-  abrirPrint(`Permiso ${p.folio||p.id}`, _htmlDocPerm(p, cfg));
+  abrirPrint(`Permiso ${p.folio||p.id}`, _wrapMediaHoja(_htmlDocPerm(p, cfg)));
 }
 
 async function _drivePermiso(id) {
