@@ -79,7 +79,6 @@ function _wrapMediaHoja(innerHtml) {
         <div style="flex:1;border-top:1px dashed #cbd5e1"></div>
         <span style="font-size:13px">✂</span>
       </div>
-      <div style="max-height:548px;overflow:hidden">${inner}</div>
     </div>`;
 }
 
