@@ -161,15 +161,15 @@ function eliminarJustificante(id) {
 
 function _htmlDocJust(j, cfg, sinPie = false, sinEncabezado = false) {
   return `
-    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:8px':''}">
+    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:6px;padding-bottom:4px':''}">
       ${sinEncabezado ? '' : membreteHeader(cfg)}
-      <div class="doc-tipo-titulo">Justificante de Inasistencia</div>
-      <div class="doc-ciclo">Ciclo Escolar ${cfg.ciclo}</div>
-      <div class="doc-folio-row">
+      <div class="doc-tipo-titulo" style="${sinEncabezado?'margin-bottom:1px':''}">Justificante de Inasistencia</div>
+      <div class="doc-ciclo" style="${sinEncabezado?'margin-bottom:6px':''}">Ciclo Escolar ${cfg.ciclo}</div>
+      <div class="doc-folio-row" style="${sinEncabezado?'margin-bottom:8px':''}">
         <span class="folio-label">FOLIO: <strong>${j.folio||j.id.toUpperCase()}</strong></span>
         <span class="folio-fecha">Expedición: ${formatFecha(j.fechaExpedicion)}</span>
       </div>
-      <div class="doc-body">
+      <div class="doc-body" style="${sinEncabezado?'font-size:12.5px;line-height:1.6':''}">
         <p>El que suscribe, personal de Orientación Educativa, hace constar que el(la) alumno(a):</p>
         <p class="doc-highlight"><strong>${j.alumno}</strong> &nbsp;|&nbsp; <strong>${j.grado} Sem. — ${j.grupo}</strong>${j.especialidad?'&nbsp;|&nbsp; Esp: <strong>'+j.especialidad+'</strong>':''}${j.noControl?'&nbsp;|&nbsp; No. Control: <strong>'+j.noControl+'</strong>':''}</p>
         <p>No asistió a clases el día <strong>${formatFecha(j.fechaAusencia)}</strong>, por el siguiente motivo:</p>
@@ -178,12 +178,12 @@ function _htmlDocJust(j, cfg, sinPie = false, sinEncabezado = false) {
         ${j.observaciones?`<p><em>Obs: ${j.observaciones}</em></p>`:''}
         <p>Se expide para los fines que al interesado convengan.</p>
       </div>
-      <div class="doc-validation-seal"><div class="seal-box">
+      <div class="doc-validation-seal" style="margin:8px 0 4px"><div class="seal-box">
         <div class="seal-title">VALIDÓ</div>
         <div class="seal-name">${j.validador||'________________________'}</div>
         <div class="seal-role">Orientación Educativa</div>
       </div></div>
-      <div class="doc-signature">
+      <div class="doc-signature" style="margin-top:10px">
         <div class="signature-box"><div class="sig-line"></div><p>${j.validador||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Orientación Educativa</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>${j.tutor||'Padre / Tutor'}</p><small>Firma de conformidad</small></div>
       </div>
