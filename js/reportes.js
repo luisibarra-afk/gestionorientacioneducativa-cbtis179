@@ -98,7 +98,7 @@ function nuevoReporte() {
     registrarActividad('reporte', `Reporte ${nuevo.folio} — ${alumno} (${nuevo.tipoFalta})`);
     cerrarModal(); renderReportes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Reporte ${nuevo.folio} registrado`);
-    autoSubirPDF(_htmlDocRep(nuevo, obtenerConfig()), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, folio: nuevo.folio, tipo: 'reporte' }, KEY_REP, nuevo.id, false);
+    autoSubirPDF(_wrapMediaHoja(_htmlDocRep(nuevo, obtenerConfig(), true, true)), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, folio: nuevo.folio, tipo: 'reporte' }, KEY_REP, nuevo.id, true);
   });
   initAlumnoAutocomplete('r-alumno', function(a) {
     document.getElementById('r-alumno').value = a.nombre;
@@ -129,7 +129,7 @@ function editarReporte(id) {
     guardarDatos(KEY_REP, datos);
     if (window.sbSync) window.sbSync(KEY_REP, [item]);
     cerrarModal(); renderReportes(); mostrarToast('Reporte actualizado');
-    autoSubirPDF(_htmlDocRep(item, obtenerConfig()), { noControl: item.noControl, nombre: item.alumno, grado: item.grado, grupo: item.grupo, folio: item.folio, tipo: 'reporte' }, KEY_REP, item.id, false);
+    autoSubirPDF(_wrapMediaHoja(_htmlDocRep(item, obtenerConfig(), true, true)), { noControl: item.noControl, nombre: item.alumno, grado: item.grado, grupo: item.grupo, folio: item.folio, tipo: 'reporte' }, KEY_REP, item.id, true);
   });
   initAlumnoAutocomplete('r-alumno', function(a) {
     document.getElementById('r-alumno').value = a.nombre;
@@ -149,17 +149,17 @@ function eliminarReporte(id) {
   renderReportes(); actualizarStats(); mostrarToast('Reporte eliminado');
 }
 
-function _htmlDocRep(r, cfg) {
+function _htmlDocRep(r, cfg, sinPie = false, sinEncabezado = false) {
   return `
-    <div class="doc-preview" id="doc-to-pdf">
-      ${membreteHeader(cfg)}
-      <div class="doc-tipo-titulo">Reporte de Conducta / Indisciplina</div>
-      <div class="doc-ciclo">Ciclo Escolar ${cfg.ciclo}</div>
-      <div class="doc-folio-row">
+    <div class="doc-preview" id="doc-to-pdf" style="${sinEncabezado?'padding-top:6px;padding-bottom:4px':''}">
+      ${sinEncabezado ? '' : membreteHeader(cfg)}
+      <div class="doc-tipo-titulo" style="${sinEncabezado?'margin-bottom:1px':''}">Reporte de Conducta / Indisciplina</div>
+      <div class="doc-ciclo" style="${sinEncabezado?'margin-bottom:6px':''}">Ciclo Escolar ${cfg.ciclo}</div>
+      <div class="doc-folio-row" style="${sinEncabezado?'margin-bottom:8px':''}">
         <span class="folio-label">FOLIO: <strong>${r.folio||r.id.toUpperCase()}</strong></span>
         <span class="folio-fecha">Fecha: ${formatFecha(r.fecha)}</span>
       </div>
-      <div class="doc-body">
+      <div class="doc-body" style="${sinEncabezado?'font-size:12.5px;line-height:1.6':''}">
         <p>Se hace constar que el(la) alumno(a):</p>
         <p class="doc-highlight"><strong>${r.alumno}</strong> &nbsp;|&nbsp; <strong>${r.grado} Sem. — ${r.grupo}</strong>${r.especialidad?'&nbsp;|&nbsp; Esp: <strong>'+r.especialidad+'</strong>':''}${r.noControl?'&nbsp;|&nbsp; No. Control: <strong>'+r.noControl+'</strong>':''}</p>
         <p>Presentó la siguiente conducta el día <strong>${formatFecha(r.fecha)}</strong>:</p>
@@ -167,14 +167,17 @@ function _htmlDocRep(r, cfg) {
         <p><strong>Descripción:</strong> <em>${r.descripcion}</em></p>
         <p><strong>Medida tomada:</strong> ${r.medida}</p>
         ${r.seguimiento?`<p><strong>Seguimiento:</strong> ${r.seguimiento}</p>`:''}
-        <p>Reportado por: <strong>${r.reporta}</strong></p>
       </div>
-      <div class="doc-signature">
-        <div class="signature-box"><div class="sig-line"></div><p>${r.reporta||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Quien reporta</small></div>
-        <div class="signature-box"><div class="sig-line"></div><p>${cfg.director||'Director(a)'}</p><small>Dirección</small></div>
+      <div class="doc-validation-seal" style="margin:8px 0 4px"><div class="seal-box">
+        <div class="seal-title">EMITIÓ</div>
+        <div class="seal-name">${r.reporta||cfg.orientadores?.[0]||'Orientador(a)'}</div>
+        <div class="seal-role">Orientación Educativa</div>
+      </div></div>
+      <div class="doc-signature" style="margin-top:10px">
+        <div class="signature-box"><div class="sig-line"></div><p>${r.reporta||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Quien emite</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>Padre / Tutor</p><small>Firma de enterado</small></div>
       </div>
-      ${membreteFooter(cfg)}
+      ${sinPie ? '' : membreteFooter(cfg)}
     </div>`;
 }
 
@@ -184,7 +187,7 @@ function imprimirReporte(id) {
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, folio: r.folio, tipo: 'reporte' };
   window._pdfUploadCtx = { modulo: KEY_REP, id: r.id, folio: r.folio };
-  abrirPrint(`Reporte ${r.folio||r.id}`, _htmlDocRep(r, cfg));
+  abrirPrint(`Reporte ${r.folio||r.id}`, _wrapMediaHoja(_htmlDocRep(r, cfg, true, true)));
 }
 
 async function _driveReporte(id) {
