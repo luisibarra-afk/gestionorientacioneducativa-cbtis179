@@ -18,29 +18,29 @@ const COLUMN_MAP = {
     id:'id', folio:'folio', alumno:'alumno', noControl:'no_control', grado:'grado', grupo:'grupo',
     fechaAusencia:'fecha_ausencia', fechaExpedicion:'fecha_expedicion',
     tutor:'tutor', telefonoTutor:'telefono_tutor', motivo:'motivo',
-    observaciones:'observaciones', validador:'validador'
+    observaciones:'observaciones', validador:'validador', pdfUrl:'pdf_url'
   },
   permisos: {
     id:'id', folio:'folio', alumno:'alumno', noControl:'no_control', grado:'grado', grupo:'grupo',
     fecha:'fecha', hora:'hora', horaRegreso:'hora_regreso',
     persona:'persona', parentesco:'parentesco', telefono:'telefono',
-    autoriza:'autoriza', validador:'validador', motivo:'motivo'
+    autoriza:'autoriza', validador:'validador', motivo:'motivo', pdfUrl:'pdf_url'
   },
   citatorios: {
     id:'id', folio:'folio', alumno:'alumno', noControl:'no_control', grado:'grado', grupo:'grupo',
     tutor:'tutor', telefonoTutor:'telefono_tutor', fechaCita:'fecha_cita',
     horaCita:'hora_cita', emite:'emite', validador:'validador',
-    estado:'estado', motivo:'motivo', acuerdos:'acuerdos', fechaCreacion:'fecha_creacion'
+    estado:'estado', motivo:'motivo', acuerdos:'acuerdos', fechaCreacion:'fecha_creacion', pdfUrl:'pdf_url'
   },
   reportes: {
     id:'id', folio:'folio', alumno:'alumno', noControl:'no_control', grado:'grado', grupo:'grupo',
     fecha:'fecha', tipoFalta:'tipo_falta', reporta:'reporta',
-    descripcion:'descripcion', medida:'medida', seguimiento:'seguimiento'
+    descripcion:'descripcion', medida:'medida', seguimiento:'seguimiento', pdfUrl:'pdf_url'
   },
   bitacora: {
     id:'id', folio:'folio', tipo:'tipo', gravedad:'gravedad', fecha:'fecha',
     hora:'hora', lugar:'lugar', reporta:'reporta', involucrados:'involucrados',
-    descripcion:'descripcion', acciones:'acciones', seguimiento:'seguimiento'
+    descripcion:'descripcion', acciones:'acciones', seguimiento:'seguimiento', pdfUrl:'pdf_url'
   },
   alumnos: {
     id:'id', noControl:'no_control', nombre:'nombre',
