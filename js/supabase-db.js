@@ -185,23 +185,18 @@ window.sbSync = function(modulo, data) {
 };
 
 // ---- Supabase Storage: subir PDF ----
-window.sbUploadPDF = async function(blob, modulo, folio) {
+// fullPath: ruta completa dentro del bucket, ej. "Expedientes 2025-2026/GARCIA LOPEZ JUAN/JUS_JUS-2026-0001_2026-03-23.pdf"
+window.sbUploadPDF = async function(blob, fullPath) {
   if (!_sb) return null;
   try {
-    const path = `${modulo}/${folio}.pdf`;
-    const { error } = await _sb.storage.from('documentos').upload(path, blob, {
+    const { error } = await _sb.storage.from('documentos').upload(fullPath, blob, {
       contentType: 'application/pdf',
       upsert: true
     });
     if (error) { console.error('Storage upload:', error.message); return null; }
-    const { data } = _sb.storage.from('documentos').getPublicUrl(path);
+    const { data } = _sb.storage.from('documentos').getPublicUrl(fullPath);
     return data.publicUrl;
   } catch (e) { console.error('Storage upload error:', e); return null; }
-};
-
-// URL pública de un PDF ya subido (sin hacer request)
-window.sbPDFUrl = function(modulo, folio) {
-  return `${_SB_URL_DEFAULT}/storage/v1/object/public/documentos/${modulo}/${folio}.pdf`;
 };
 
 // Función para eliminar de Supabase (llamada explícita desde los módulos)

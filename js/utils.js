@@ -185,13 +185,37 @@ async function descargarPDFActual() {
     if (window.guardarPDFEnDrive && window._expedienteAlumno) {
       window.guardarPDFEnDrive(blob, window._expedienteAlumno).catch(() => {});
     }
-    // Subir a Supabase Storage para acceso compartido
+    // Subir a Supabase Storage con la misma estructura de carpetas que Drive
     if (window.sbUploadPDF && window._pdfUploadCtx) {
-      const { modulo, id, folio } = window._pdfUploadCtx;
+      const { modulo, id } = window._pdfUploadCtx;
       window._pdfUploadCtx = null;
-      window.sbUploadPDF(blob, modulo, folio).then(url => {
+      const alumno = window._expedienteAlumno || {};
+      const cfg2 = typeof obtenerConfig === 'function' ? obtenerConfig() : {};
+      const ciclo = cfg2.ciclo || '2025-2026';
+      const fecha = new Date().toISOString().slice(0, 10);
+      const tipo  = (alumno.tipo || modulo).toUpperCase();
+      const folio = alumno.folio || 'SN';
+      const fileName = `${tipo}_${folio}_${fecha}.pdf`;
+      let carpeta;
+      if (alumno.carpetaRaiz) {
+        // Visitas u otras carpetas personalizadas
+        const sub = alumno.subcarpeta || alumno.nombre || 'SIN_GRUPO';
+        carpeta = `${alumno.carpetaRaiz}/${sub}`;
+      } else if (modulo === 'bitacora') {
+        carpeta = 'Bitacora';
+      } else {
+        // Expediente del alumno
+        const cache = window._alumnosCache || [];
+        const alu = cache.find(a => a.noControl && a.noControl === alumno.noControl) || {};
+        const apPat  = (alu.apellidoPaterno || '').toUpperCase().trim();
+        const apMat  = (alu.apellidoMaterno || '').toUpperCase().trim();
+        const nomP   = (alu.nombrePropio   || '').toUpperCase().trim();
+        const nombreAlu = [apPat, apMat, nomP].filter(Boolean).join(' ')
+                        || (alumno.nombre || 'SIN-NOMBRE').toUpperCase();
+        carpeta = `Expedientes ${ciclo}/${nombreAlu.replace(/[<>:"/\\|?*]/g,'').trim()}`;
+      }
+      window.sbUploadPDF(blob, `${carpeta}/${fileName}`).then(url => {
         if (url) {
-          // Marcar el registro como subido en localStorage
           const datos = obtenerDatos(modulo);
           const rec = datos.find(x => x.id === id);
           if (rec) { rec.pdfUrl = url; guardarDatos(modulo, datos); }
