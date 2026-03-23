@@ -11,7 +11,7 @@ function renderJustificantes(datos) {
       <td><span class="folio-tag">${j.folio || '-'}</span></td>
       <td><strong>${j.alumno}</strong>${j.noControl ? '<br><small style="color:#94a3b8">'+j.noControl+'</small>' : ''}</td>
       <td>${j.grado} ${j.grupo}</td>
-      <td>${formatFecha(j.fechaAusencia)}</td>
+      <td title="${j.fechaAusencia||''}">${(j.fechaAusencia||'-').length>18?(j.fechaAusencia).slice(0,18)+'…':j.fechaAusencia||'-'}</td>
       <td title="${j.motivo}">${j.motivo.length > 35 ? j.motivo.slice(0,35)+'…' : j.motivo}</td>
       <td><small>${j.validador || '-'}</small></td>
       <td><div class="btn-actions">
