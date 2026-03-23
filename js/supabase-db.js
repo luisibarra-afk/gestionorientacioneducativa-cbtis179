@@ -149,6 +149,9 @@ async function sbPullModulo(modulo) {
   }
 }
 
+// Exponer sbPullModulo globalmente para que el autocomplete pueda refrescar alumnos
+window.sbPullModulo = sbPullModulo;
+
 // Pull: descarga todos los módulos
 window.sbPullAll = async function() {
   if (!_sb) return;

@@ -34,16 +34,28 @@ function initAlumnoAutocomplete(inputId, onSelect) {
     cerrar();
     if (q.length < 1) return;
 
-    const cache = window._alumnosCache || obtenerDatos('alumnos');
-    const matches = cache.filter(a => {
-      const nombre  = (a.nombre || '').toLowerCase();
-      const noCtrl  = (a.noControl || '').toLowerCase();
-      const ap      = (a.apellidoPaterno || '').toLowerCase();
-      const am      = (a.apellidoMaterno || '').toLowerCase();
-      return nombre.includes(q) || noCtrl.includes(q) || ap.includes(q) || am.includes(q);
-    }).slice(0, 8);
+    // Leer siempre fresco: el cache puede estar vacío si Supabase no terminó aún
+    const lista = (window._alumnosCache && window._alumnosCache.length > 0)
+      ? window._alumnosCache
+      : obtenerDatos('alumnos');
+    const matches = lista.filter(a => {
+      const nombre    = (a.nombre || '').toLowerCase();
+      const noCtrl    = (a.noControl || '').toLowerCase();
+      const ap        = (a.apellidoPaterno || '').toLowerCase();
+      const am        = (a.apellidoMaterno || '').toLowerCase();
+      const np        = (a.nombrePropio || '').toLowerCase();
+      const completo  = [ap, am, np].filter(Boolean).join(' ');
+      return nombre.includes(q) || noCtrl.includes(q) || ap.includes(q)
+          || am.includes(q) || np.includes(q) || completo.includes(q);
+    }).slice(0, 10);
 
-    if (!matches.length) return;
+    // Si no hay resultados y la lista local está vacía, pedir refresh a Supabase
+    if (!matches.length) {
+      if (lista.length === 0 && typeof window.sbPullModulo === 'function') {
+        window.sbPullModulo('alumnos');
+      }
+      return;
+    }
     posicionar();
 
     matches.forEach((alumno) => {
