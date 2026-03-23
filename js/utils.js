@@ -257,27 +257,18 @@ async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = 
                       || (expedienteAlumno.nombre || 'SIN-NOMBRE').toUpperCase();
       carpeta = `Expedientes ${ciclo}/${nombreAlu.replace(/[<>:"/\\|?*]/g,'').trim()}`;
     }
-    // Renderizar HTML en un iframe oculto para que html2canvas tenga estilos completos
-    const iframe = document.createElement('iframe');
-    iframe.style.cssText = 'position:fixed;top:-9999px;left:0;width:794px;height:600px;border:none;visibility:hidden;';
-    document.body.appendChild(iframe);
-    const iDoc = iframe.contentDocument;
-    // Copiar todos los estilos de la página principal
-    const estilos = Array.from(document.styleSheets).map(s => {
-      try { return Array.from(s.cssRules).map(r => r.cssText).join('\n'); } catch { return ''; }
-    }).join('\n');
-    iDoc.open();
-    iDoc.write(`<!DOCTYPE html><html><head><style>${estilos}</style></head><body style="margin:0;background:#fff">${htmlContent}</body></html>`);
-    iDoc.close();
-    // Esperar a que cargue
-    await new Promise(r => setTimeout(r, 400));
-    const el = iDoc.getElementById('doc-to-pdf') || iDoc.body.firstElementChild;
-    if (!el) { document.body.removeChild(iframe); return; }
+    // Renderizar en el DOM principal pero invisible — html2canvas necesita el documento principal
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;top:0;left:0;width:794px;opacity:0;pointer-events:none;z-index:-1;background:#fff;';
+    wrapper.innerHTML = htmlContent;
+    document.body.appendChild(wrapper);
+    const el = wrapper.querySelector('#doc-to-pdf') || wrapper.firstElementChild;
+    if (!el) { document.body.removeChild(wrapper); return; }
+    // Esperar a que el navegador calcule estilos y dimensiones
+    await new Promise(r => setTimeout(r, 300));
     const altura = Math.max(el.scrollHeight, el.offsetHeight, 400);
-    iframe.style.height = altura + 'px';
-    await new Promise(r => setTimeout(r, 100));
     const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, width: 794, height: altura });
-    document.body.removeChild(iframe);
+    document.body.removeChild(wrapper);
     if (!canvas.width || !canvas.height) throw new Error('Canvas vacío');
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
