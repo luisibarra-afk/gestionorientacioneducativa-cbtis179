@@ -257,12 +257,15 @@ async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = 
                       || (expedienteAlumno.nombre || 'SIN-NOMBRE').toUpperCase();
       carpeta = `Expedientes ${ciclo}/${nombreAlu.replace(/[<>:"/\\|?*]/g,'').trim()}`;
     }
-    // Renderizar HTML off-screen
+    // Renderizar HTML off-screen (left:-9999px para que html2canvas lo procese bien)
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position:fixed;top:-9999px;left:0;width:794px;z-index:-1;background:#fff';
+    wrapper.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;background:#fff;';
     wrapper.innerHTML = htmlContent;
     document.body.appendChild(wrapper);
-    const el = wrapper.firstElementChild;
+    const el = wrapper.querySelector('#doc-to-pdf') || wrapper.firstElementChild;
+    if (!el) { document.body.removeChild(wrapper); return; }
+    // Esperar un frame para que el navegador calcule estilos
+    await new Promise(r => requestAnimationFrame(r));
     const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, width: 794, height: el.scrollHeight });
     document.body.removeChild(wrapper);
     const { jsPDF } = window.jspdf;
