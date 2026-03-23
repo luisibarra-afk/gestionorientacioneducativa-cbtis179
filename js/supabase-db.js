@@ -200,11 +200,14 @@ window.sbBulkUpsertAlumnos = async function(alumnos) {
   }
 };
 
-// Auto-iniciar si ya hay config guardada
+// Credenciales por defecto (todos los usuarios se conectan automáticamente)
+const _SB_URL_DEFAULT = 'https://alajpjhhkehhrksawdqb.supabase.co';
+const _SB_KEY_DEFAULT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsYWpwamhoa2VoaHJrc2F3ZHFiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE3MjQwNjQsImV4cCI6MjA4NzMwMDA2NH0.C55xSZTJ7EQE5NBbf9QopwZo4f44rbh1ZgOcSRdfN2k';
+
+// Auto-iniciar: usa config guardada o las credenciales por defecto
 (function() {
   const cfg = JSON.parse(localStorage.getItem('config') || '{}');
-  if (cfg.sbUrl && cfg.sbKey) {
-    // Esperar a que el DOM esté listo
-    setTimeout(() => iniciarSupabase(cfg.sbUrl, cfg.sbKey), 500);
-  }
+  const url = cfg.sbUrl || _SB_URL_DEFAULT;
+  const key = cfg.sbKey || _SB_KEY_DEFAULT;
+  setTimeout(() => iniciarSupabase(url, key), 500);
 })();
