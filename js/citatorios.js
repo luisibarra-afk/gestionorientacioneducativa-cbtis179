@@ -17,7 +17,7 @@ function renderCitatorios(datos) {
       <td><small>${c.validador||'-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirCitatorio('${c.id}')"><i class="fas fa-file-pdf"></i></button>
-        <button class="btn-icon ${c.driveSaved?'drive':'drive-pend'}" title="${c.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveCitatorio('${c.id}')"><i class="fab fa-google-drive"></i></button>
+        ${c.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${c.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Guardar en Drive" onclick="_driveCitatorio('${c.id}')"><i class="fab fa-google-drive"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarCitatorio('${c.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarCitatorio('${c.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
@@ -189,6 +189,7 @@ function imprimirCitatorio(id) {
   if (!c) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: c.noControl, nombre: c.alumno, grado: c.grado, grupo: c.grupo, especialidad: c.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===c.noControl)||{}).turno, folio: c.folio, tipo: 'citatorio' };
+  window._pdfUploadCtx = { modulo: KEY_CIT, id: c.id, folio: c.folio };
   abrirPrint(`Citatorio ${c.folio||c.id}`, _wrapMediaHoja(_htmlDocCit(c, cfg, true, true)));
 }
 

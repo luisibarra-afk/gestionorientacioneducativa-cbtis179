@@ -33,7 +33,7 @@ function renderBitacora(datos) {
         <div class="btn-actions">
           <button class="btn-icon view" title="Ver detalle" onclick="verIncidente('${b.id}')"><i class="fas fa-eye"></i></button>
           <button class="btn-icon print" title="Vista previa / PDF" onclick="imprimirIncidente('${b.id}')"><i class="fas fa-file-pdf"></i></button>
-          <button class="btn-icon ${b.driveSaved?'drive':'drive-pend'}" title="${b.driveSaved?'Guardado en Drive':'Guardar PDF en Drive'}" onclick="_driveBitPDF('${b.id}')"><i class="fab fa-google-drive"></i></button>
+          ${b.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${b.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Guardar PDF en Drive" onclick="_driveBitPDF('${b.id}')"><i class="fab fa-google-drive"></i></button>`}
           <button class="btn-icon edit" title="Editar" onclick="editarIncidente('${b.id}')"><i class="fas fa-edit"></i></button>
           ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarIncidente('${b.id}')"><i class="fas fa-trash"></i></button>`:''}
         </div>
@@ -315,6 +315,7 @@ function imprimirIncidente(id) {
   const b = obtenerDatos(KEY_BIT).find(x => x.id === id);
   if (!b) return;
   const cfg = obtenerConfig();
+  window._pdfUploadCtx = { modulo: KEY_BIT, id: b.id, folio: b.folio };
   abrirPrint(`Incidente ${b.folio || b.id}`, _htmlDocBit(b, cfg));
 }
 

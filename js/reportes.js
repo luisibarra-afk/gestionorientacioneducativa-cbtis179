@@ -27,7 +27,7 @@ function renderReportes(datos) {
       <td>${formatFecha(r.fecha)}</td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirReporte('${r.id}')"><i class="fas fa-file-pdf"></i></button>
-        <button class="btn-icon ${r.driveSaved?'drive':'drive-pend'}" title="${r.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveReporte('${r.id}')"><i class="fab fa-google-drive"></i></button>
+        ${r.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${r.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Guardar en Drive" onclick="_driveReporte('${r.id}')"><i class="fab fa-google-drive"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarReporte('${r.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarReporte('${r.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
@@ -183,6 +183,7 @@ function imprimirReporte(id) {
   if (!r) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: r.noControl, nombre: r.alumno, grado: r.grado, grupo: r.grupo, folio: r.folio, tipo: 'reporte' };
+  window._pdfUploadCtx = { modulo: KEY_REP, id: r.id, folio: r.folio };
   abrirPrint(`Reporte ${r.folio||r.id}`, _htmlDocRep(r, cfg));
 }
 

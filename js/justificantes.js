@@ -16,7 +16,7 @@ function renderJustificantes(datos) {
       <td><small>${j.validador || '-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirJustificante('${j.id}')"><i class="fas fa-file-pdf"></i></button>
-        <button class="btn-icon ${j.driveSaved?'drive':'drive-pend'}" title="${j.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveJustificante('${j.id}')"><i class="fab fa-google-drive"></i></button>
+        ${j.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${j.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Guardar en Drive" onclick="_driveJustificante('${j.id}')"><i class="fab fa-google-drive"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarJustificante('${j.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarJustificante('${j.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
@@ -195,6 +195,7 @@ function imprimirJustificante(id) {
   if (!j) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: j.noControl, nombre: j.alumno, grado: j.grado, grupo: j.grupo, especialidad: j.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===j.noControl)||{}).turno, folio: j.folio, tipo: 'justificante' };
+  window._pdfUploadCtx = { modulo: KEY_JUST, id: j.id, folio: j.folio };
   abrirPrint(`Justificante ${j.folio||j.id}`, _wrapMediaHoja(_htmlDocJust(j, cfg, true, true)));
 }
 

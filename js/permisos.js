@@ -16,7 +16,7 @@ function renderPermisos(datos) {
       <td><small>${p.validador||'-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirPermiso('${p.id}')"><i class="fas fa-file-pdf"></i></button>
-        <button class="btn-icon ${p.driveSaved?'drive':'drive-pend'}" title="${p.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_drivePermiso('${p.id}')"><i class="fab fa-google-drive"></i></button>
+        ${p.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${p.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Guardar en Drive" onclick="_drivePermiso('${p.id}')"><i class="fab fa-google-drive"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarPermiso('${p.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarPermiso('${p.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
@@ -184,6 +184,7 @@ function imprimirPermiso(id) {
   if (!p) return;
   const cfg = obtenerConfig();
   window._expedienteAlumno = { noControl: p.noControl, nombre: p.alumno, grado: p.grado, grupo: p.grupo, especialidad: p.especialidad, turno: (obtenerDatos('alumnos').find(a=>a.noControl===p.noControl)||{}).turno, folio: p.folio, tipo: 'permiso' };
+  window._pdfUploadCtx = { modulo: KEY_PERM, id: p.id, folio: p.folio };
   abrirPrint(`Permiso ${p.folio||p.id}`, _wrapMediaHoja(_htmlDocPerm(p, cfg, true, true)));
 }
 

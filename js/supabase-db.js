@@ -184,6 +184,26 @@ window.sbSync = function(modulo, data) {
   sbUpsertRegistro(modulo, data[0]);
 };
 
+// ---- Supabase Storage: subir PDF ----
+window.sbUploadPDF = async function(blob, modulo, folio) {
+  if (!_sb) return null;
+  try {
+    const path = `${modulo}/${folio}.pdf`;
+    const { error } = await _sb.storage.from('documentos').upload(path, blob, {
+      contentType: 'application/pdf',
+      upsert: true
+    });
+    if (error) { console.error('Storage upload:', error.message); return null; }
+    const { data } = _sb.storage.from('documentos').getPublicUrl(path);
+    return data.publicUrl;
+  } catch (e) { console.error('Storage upload error:', e); return null; }
+};
+
+// URL pública de un PDF ya subido (sin hacer request)
+window.sbPDFUrl = function(modulo, folio) {
+  return `${_SB_URL_DEFAULT}/storage/v1/object/public/documentos/${modulo}/${folio}.pdf`;
+};
+
 // Función para eliminar de Supabase (llamada explícita desde los módulos)
 window.sbDelete = function(modulo, id) {
   sbDeleteRegistro(modulo, id);

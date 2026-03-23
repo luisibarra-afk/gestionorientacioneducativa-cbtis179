@@ -180,12 +180,25 @@ async function descargarPDFActual() {
     }
     const nombre = _pdfTituloActual.replace(/[^a-zA-Z0-9\-_áéíóúÁÉÍÓÚñÑ ]/g, '') || 'documento';
     pdf.save(`${nombre}.pdf`);
+    const blob = pdf.output('blob');
     // Guardar en Drive si está conectado
     if (window.guardarPDFEnDrive && window._expedienteAlumno) {
-      const blob = pdf.output('blob');
       window.guardarPDFEnDrive(blob, window._expedienteAlumno).catch(() => {});
     }
-    mostrarToast('PDF descargado correctamente');
+    // Subir a Supabase Storage para acceso compartido
+    if (window.sbUploadPDF && window._pdfUploadCtx) {
+      const { modulo, id, folio } = window._pdfUploadCtx;
+      window._pdfUploadCtx = null;
+      window.sbUploadPDF(blob, modulo, folio).then(url => {
+        if (url) {
+          // Marcar el registro como subido en localStorage
+          const datos = obtenerDatos(modulo);
+          const rec = datos.find(x => x.id === id);
+          if (rec) { rec.pdfUrl = url; guardarDatos(modulo, datos); }
+        }
+      });
+    }
+    mostrarToast('PDF descargado y subido a la nube');
   } catch (e) {
     mostrarToast('Error al generar PDF: ' + e.message, 'error');
   } finally {
