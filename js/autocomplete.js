@@ -29,8 +29,13 @@ function initAlumnoAutocomplete(inputId, onSelect) {
     seleccionIdx = -1;
   }
 
+  // Normaliza texto quitando acentos para búsqueda tolerante
+  function norm(str) {
+    return (str || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  }
+
   input.addEventListener('input', function () {
-    const q = this.value.trim().toLowerCase();
+    const q = norm(this.value.trim());
     cerrar();
     if (q.length < 1) return;
 
@@ -39,12 +44,12 @@ function initAlumnoAutocomplete(inputId, onSelect) {
       ? window._alumnosCache
       : obtenerDatos('alumnos');
     const matches = lista.filter(a => {
-      const nombre    = (a.nombre || '').toLowerCase();
-      const noCtrl    = (a.noControl || '').toLowerCase();
-      const ap        = (a.apellidoPaterno || '').toLowerCase();
-      const am        = (a.apellidoMaterno || '').toLowerCase();
-      const np        = (a.nombrePropio || '').toLowerCase();
-      const completo  = [ap, am, np].filter(Boolean).join(' ');
+      const nombre   = norm(a.nombre);
+      const noCtrl   = norm(a.noControl);
+      const ap       = norm(a.apellidoPaterno);
+      const am       = norm(a.apellidoMaterno);
+      const np       = norm(a.nombrePropio);
+      const completo = [ap, am, np].filter(Boolean).join(' ');
       return nombre.includes(q) || noCtrl.includes(q) || ap.includes(q)
           || am.includes(q) || np.includes(q) || completo.includes(q);
     }).slice(0, 10);
@@ -68,6 +73,12 @@ function initAlumnoAutocomplete(inputId, onSelect) {
         <span class="ac-info">${alumno.noControl || ''} · ${alumno.grado || ''} ${alumno.grupo || ''}</span>`;
       li.addEventListener('mousedown', function (e) {
         e.preventDefault();
+        // Garantizar que alumno.nombre siempre esté lleno
+        if (!alumno.nombre) alumno.nombre = nombreMostrar;
+        // Normalizar grado al formato con °
+        if (alumno.grado && !alumno.grado.includes('°')) {
+          alumno.grado = alumno.grado.trim() + '°';
+        }
         onSelect(alumno);
         input.value = nombreMostrar;
         cerrar();
