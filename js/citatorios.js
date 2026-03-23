@@ -112,7 +112,7 @@ function nuevoCitatorio() {
     registrarActividad('citatorio', `Citatorio ${nuevo.folio} — tutor de ${alumno}`);
     cerrarModal(); renderCitatorios(); actualizarStats(); actualizarActividad();
     mostrarToast(`Citatorio ${nuevo.folio} registrado`);
-    _driveCitatorio(nuevo.id);
+    autoSubirPDF(_wrapMediaHoja(_htmlDocCit(nuevo, obtenerConfig(), true, true)), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, especialidad: nuevo.especialidad, folio: nuevo.folio, tipo: 'citatorio' }, KEY_CIT, nuevo.id, true);
   });
   _acCitatorio();
 }
@@ -139,7 +139,7 @@ function editarCitatorio(id) {
     guardarDatos(KEY_CIT, datos);
     if (window.sbSync) window.sbSync(KEY_CIT, [item]);
     cerrarModal(); renderCitatorios(); mostrarToast('Citatorio actualizado');
-    _driveCitatorio(item.id);
+    autoSubirPDF(_wrapMediaHoja(_htmlDocCit(item, obtenerConfig(), true, true)), { noControl: item.noControl, nombre: item.alumno, grado: item.grado, grupo: item.grupo, especialidad: item.especialidad, folio: item.folio, tipo: 'citatorio' }, KEY_CIT, item.id, true);
   });
   _acCitatorio();
 }

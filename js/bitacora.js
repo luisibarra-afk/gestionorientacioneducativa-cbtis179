@@ -195,7 +195,7 @@ function nuevoIncidente() {
     actualizarStats();
     actualizarActividad();
     mostrarToast(`Incidente ${nuevo.folio} registrado en bitácora`);
-    _driveBitPDF(nuevo.id);
+    autoSubirPDF(_htmlDocBit(nuevo, obtenerConfig()), { folio: nuevo.folio, tipo: 'bitacora' }, KEY_BIT, nuevo.id, false);
   });
 }
 
@@ -220,7 +220,7 @@ function editarIncidente(id) {
     cerrarModal();
     renderBitacora();
     mostrarToast('Incidente actualizado');
-    _driveBitPDF(item.id);
+    autoSubirPDF(_htmlDocBit(item, obtenerConfig()), { folio: item.folio, tipo: 'bitacora' }, KEY_BIT, item.id, false);
   });
 }
 

@@ -98,7 +98,7 @@ function nuevoReporte() {
     registrarActividad('reporte', `Reporte ${nuevo.folio} — ${alumno} (${nuevo.tipoFalta})`);
     cerrarModal(); renderReportes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Reporte ${nuevo.folio} registrado`);
-    _driveReporte(nuevo.id);
+    autoSubirPDF(_htmlDocRep(nuevo, obtenerConfig()), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, folio: nuevo.folio, tipo: 'reporte' }, KEY_REP, nuevo.id, false);
   });
   initAlumnoAutocomplete('r-alumno', function(a) {
     document.getElementById('r-alumno').value = a.nombre;
@@ -129,7 +129,7 @@ function editarReporte(id) {
     guardarDatos(KEY_REP, datos);
     if (window.sbSync) window.sbSync(KEY_REP, [item]);
     cerrarModal(); renderReportes(); mostrarToast('Reporte actualizado');
-    _driveReporte(item.id);
+    autoSubirPDF(_htmlDocRep(item, obtenerConfig()), { noControl: item.noControl, nombre: item.alumno, grado: item.grado, grupo: item.grupo, folio: item.folio, tipo: 'reporte' }, KEY_REP, item.id, false);
   });
   initAlumnoAutocomplete('r-alumno', function(a) {
     document.getElementById('r-alumno').value = a.nombre;

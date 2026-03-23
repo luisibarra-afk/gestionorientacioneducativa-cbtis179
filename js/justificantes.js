@@ -103,7 +103,8 @@ function nuevoJustificante() {
     registrarActividad('justificante', `Justificante ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderJustificantes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Justificante ${nuevo.folio} registrado`);
-    _driveJustificante(nuevo.id);
+    const cfg2 = obtenerConfig();
+    autoSubirPDF(_wrapMediaHoja(_htmlDocJust(nuevo, cfg2, true, true)), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, especialidad: nuevo.especialidad, folio: nuevo.folio, tipo: 'justificante' }, KEY_JUST, nuevo.id, true);
   });
   initAlumnoAutocomplete('j-alumno', function(a) {
     document.getElementById('j-alumno').value = a.nombre;
@@ -136,7 +137,8 @@ function editarJustificante(id) {
     guardarDatos(KEY_JUST, datos);
     if (window.sbSync) window.sbSync(KEY_JUST, [item]);
     cerrarModal(); renderJustificantes(); mostrarToast('Justificante actualizado');
-    _driveJustificante(item.id);
+    const cfg3 = obtenerConfig();
+    autoSubirPDF(_wrapMediaHoja(_htmlDocJust(item, cfg3, true, true)), { noControl: item.noControl, nombre: item.alumno, grado: item.grado, grupo: item.grupo, especialidad: item.especialidad, folio: item.folio, tipo: 'justificante' }, KEY_JUST, item.id, true);
   });
   initAlumnoAutocomplete('j-alumno', function(a) {
     document.getElementById('j-alumno').value = a.nombre;

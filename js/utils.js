@@ -231,6 +231,64 @@ async function descargarPDFActual() {
   }
 }
 
+// Genera y sube PDF a Supabase en segundo plano (sin modal, sin descarga)
+async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = false) {
+  if (!window.sbUploadPDF) return;
+  try {
+    const cfg2 = typeof obtenerConfig === 'function' ? obtenerConfig() : {};
+    const ciclo = cfg2.ciclo || '2025-2026';
+    const fecha = new Date().toISOString().slice(0, 10);
+    const tipo  = (expedienteAlumno.tipo || modulo).toUpperCase();
+    const folio = expedienteAlumno.folio || 'SN';
+    const fileName = `${tipo}_${folio}_${fecha}.pdf`;
+    let carpeta;
+    if (expedienteAlumno.carpetaRaiz) {
+      const sub = expedienteAlumno.subcarpeta || expedienteAlumno.nombre || 'SIN_GRUPO';
+      carpeta = `${expedienteAlumno.carpetaRaiz}/${sub}`;
+    } else if (modulo === 'bitacora') {
+      carpeta = 'Bitacora';
+    } else {
+      const cache = window._alumnosCache || [];
+      const alu = cache.find(a => a.noControl && a.noControl === expedienteAlumno.noControl) || {};
+      const apPat = (alu.apellidoPaterno || '').toUpperCase().trim();
+      const apMat = (alu.apellidoMaterno || '').toUpperCase().trim();
+      const nomP  = (alu.nombrePropio   || '').toUpperCase().trim();
+      const nombreAlu = [apPat, apMat, nomP].filter(Boolean).join(' ')
+                      || (expedienteAlumno.nombre || 'SIN-NOMBRE').toUpperCase();
+      carpeta = `Expedientes ${ciclo}/${nombreAlu.replace(/[<>:"/\\|?*]/g,'').trim()}`;
+    }
+    // Renderizar HTML off-screen
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;top:-9999px;left:0;width:794px;z-index:-1;background:#fff';
+    wrapper.innerHTML = htmlContent;
+    document.body.appendChild(wrapper);
+    const el = wrapper.firstElementChild;
+    const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff', logging: false, width: 794, height: el.scrollHeight });
+    document.body.removeChild(wrapper);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pdfW = pdf.internal.pageSize.getWidth();
+    const a4H  = pdf.internal.pageSize.getHeight();
+    const imgData = canvas.toDataURL('image/png');
+    if (isHalf) {
+      const imgH = (canvas.height / canvas.width) * pdfW;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, Math.min(imgH, a4H / 2));
+    } else {
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, a4H);
+    }
+    const blob = pdf.output('blob');
+    const url = await window.sbUploadPDF(blob, `${carpeta}/${fileName}`);
+    if (url) {
+      const datos = obtenerDatos(modulo);
+      const rec = datos.find(x => x.id === id);
+      if (rec) { rec.pdfUrl = url; guardarDatos(modulo, datos); if (window.sbSync) window.sbSync(modulo, [rec]); }
+      // Re-renderizar tabla para mostrar botón nube
+      const renders = { justificantes: renderJustificantes, citatorios: renderCitatorios, permisos: renderPermisos, reportes: renderReportes, bitacora: renderBitacora, visitas: renderVisitas };
+      if (renders[modulo]) renders[modulo]();
+    }
+  } catch (e) { console.error('autoSubirPDF error:', e); }
+}
+
 // Actividad reciente
 function registrarActividad(tipo, descripcion) {
   const actividad = obtenerDatos('actividad');

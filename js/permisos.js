@@ -107,7 +107,7 @@ function nuevoPermiso() {
     registrarActividad('permiso', `Permiso ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderPermisos(); actualizarStats(); actualizarActividad();
     mostrarToast(`Permiso ${nuevo.folio} registrado`);
-    _drivePermiso(nuevo.id);
+    autoSubirPDF(_wrapMediaHoja(_htmlDocPerm(nuevo, obtenerConfig(), true, true)), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, especialidad: nuevo.especialidad, folio: nuevo.folio, tipo: 'permiso' }, KEY_PERM, nuevo.id, true);
   });
   _acPermiso();
 }
@@ -134,7 +134,7 @@ function editarPermiso(id) {
     guardarDatos(KEY_PERM, datos);
     if (window.sbSync) window.sbSync(KEY_PERM, [item]);
     cerrarModal(); renderPermisos(); mostrarToast('Permiso actualizado');
-    _drivePermiso(item.id);
+    autoSubirPDF(_wrapMediaHoja(_htmlDocPerm(item, obtenerConfig(), true, true)), { noControl: item.noControl, nombre: item.alumno, grado: item.grado, grupo: item.grupo, especialidad: item.especialidad, folio: item.folio, tipo: 'permiso' }, KEY_PERM, item.id, true);
   });
   _acPermiso();
 }
