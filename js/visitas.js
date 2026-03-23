@@ -18,7 +18,7 @@ function renderVisitas(datos) {
       <td><div class="btn-actions">
         <button class="btn-icon view" title="Ver expediente del grupo" onclick="verExpedienteGrupo('${encodeURIComponent(v.grupo||'')}')"><i class="fas fa-folder-open"></i></button>
         <button class="btn-icon print" title="PDF" onclick="imprimirVisita('${v.id}')"><i class="fas fa-file-pdf"></i></button>
-        <button class="btn-icon ${v.driveSaved?'drive':'drive-pend'}" title="${v.driveSaved?'Guardado en Drive':'Guardar en Drive'}" onclick="_driveVisita('${v.id}')"><i class="fab fa-google-drive"></i></button>
+        ${v.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${v.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Pendiente de subir a nube" disabled><i class="fas fa-cloud-upload-alt"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarVisita('${v.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarVisita('${v.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
@@ -225,6 +225,8 @@ function _htmlVisita(v) {
 function imprimirVisita(id) {
   const v = obtenerDatos(KEY_VIS).find(x => x.id === id);
   if (!v) return;
+  window._expedienteAlumno = { carpetaRaiz: 'Visitas en el Aula', subcarpeta: v.grupo || 'SIN_GRUPO', folio: v.folio, tipo: 'visita' };
+  window._pdfUploadCtx = { modulo: KEY_VIS, id: v.id, folio: v.folio };
   abrirPrint(`Visita ${v.folio}`, _htmlVisita(v));
 }
 
