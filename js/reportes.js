@@ -170,11 +170,11 @@ function _htmlDocRep(r, cfg, sinPie = false, sinEncabezado = false) {
       </div>
       <div class="doc-validation-seal" style="margin:8px 0 4px"><div class="seal-box">
         <div class="seal-title">EMITIÓ</div>
-        <div class="seal-name">${r.reporta||cfg.orientadores?.[0]||'Orientador(a)'}</div>
+        <div class="seal-name">${r.validador||cfg.orientadores?.[0]||'Orientador(a)'}</div>
         <div class="seal-role">Orientación Educativa</div>
       </div></div>
       <div class="doc-signature" style="margin-top:10px">
-        <div class="signature-box"><div class="sig-line"></div><p>${r.reporta||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Quien emite</small></div>
+        <div class="signature-box"><div class="sig-line"></div><p>${r.validador||cfg.orientadores?.[0]||'Orientador(a)'}</p><small>Quien emite</small></div>
         <div class="signature-box"><div class="sig-line"></div><p>Padre / Tutor</p><small>Firma de enterado</small></div>
       </div>
       ${sinPie ? '' : membreteFooter(cfg)}
