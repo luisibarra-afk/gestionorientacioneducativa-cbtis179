@@ -147,7 +147,16 @@ async function sbPullModulo(modulo) {
   const { data, error } = await _sb.from(table).select('*').order('created_at', { ascending: false });
   if (error) { console.error(`Supabase pull [${modulo}]:`, error.message); return; }
   if (data && data.length > 0) {
-    const mapped = data.map(row => dbToJs(modulo, row));
+    // Preservar campos locales que no están en el schema de Supabase (ej. pdfUrl)
+    const local = JSON.parse(localStorage.getItem(modulo) || '[]');
+    const localMap = {};
+    local.forEach(r => { if (r.id) localMap[r.id] = r; });
+    const mapped = data.map(row => {
+      const js = dbToJs(modulo, row);
+      const prev = localMap[js.id] || {};
+      // Campos DB tienen prioridad; campos solo-locales (pdfUrl, etc.) se preservan
+      return Object.assign({}, prev, js);
+    });
     localStorage.setItem(modulo, JSON.stringify(mapped));
     // Re-render si la página está activa
     const renders = {

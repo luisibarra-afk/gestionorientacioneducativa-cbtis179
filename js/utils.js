@@ -199,7 +199,7 @@ async function descargarPDFActual() {
       let carpeta;
       if (alumno.carpetaRaiz) {
         // Visitas u otras carpetas personalizadas
-        const sub = alumno.subcarpeta || alumno.nombre || 'SIN_GRUPO';
+        const sub = limpiarRutaStorage(alumno.subcarpeta || alumno.nombre || 'SIN_GRUPO');
         carpeta = `${alumno.carpetaRaiz}/${sub}`;
       } else if (modulo === 'bitacora') {
         carpeta = 'Bitacora';
@@ -210,9 +210,11 @@ async function descargarPDFActual() {
         const apPat  = (alu.apellidoPaterno || '').toUpperCase().trim();
         const apMat  = (alu.apellidoMaterno || '').toUpperCase().trim();
         const nomP   = (alu.nombrePropio   || '').toUpperCase().trim();
-        const nombreAlu = [apPat, apMat, nomP].filter(Boolean).join(' ')
-                        || (alumno.nombre || 'SIN-NOMBRE').toUpperCase();
-        carpeta = `Expedientes ${ciclo}/${nombreAlu.replace(/[<>:"/\\|?*]/g,'').trim()}`;
+        const nombreAlu = limpiarRutaStorage(
+          [apPat, apMat, nomP].filter(Boolean).join(' ')
+          || (alumno.nombre || 'SIN-NOMBRE').toUpperCase()
+        );
+        carpeta = `Expedientes ${limpiarRutaStorage(ciclo)}/${nombreAlu}`;
       }
       window.sbUploadPDF(blob, `${carpeta}/${fileName}`).then(url => {
         if (url) {
@@ -231,6 +233,17 @@ async function descargarPDFActual() {
   }
 }
 
+// Sanitiza nombres para rutas de Supabase Storage (sin Ñ, acentos ni caracteres especiales)
+function limpiarRutaStorage(str) {
+  return (str || '')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quitar acentos
+    .replace(/[ñÑ]/g, 'N')
+    .replace(/[^a-zA-Z0-9 _\-\.]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 80);
+}
+
 // Genera y sube PDF a Supabase en segundo plano (sin modal, sin descarga)
 async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = false) {
   if (!window.sbUploadPDF) return;
@@ -243,7 +256,7 @@ async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = 
     const fileName = `${tipo}_${folio}_${fecha}.pdf`;
     let carpeta;
     if (expedienteAlumno.carpetaRaiz) {
-      const sub = expedienteAlumno.subcarpeta || expedienteAlumno.nombre || 'SIN_GRUPO';
+      const sub = limpiarRutaStorage(expedienteAlumno.subcarpeta || expedienteAlumno.nombre || 'SIN_GRUPO');
       carpeta = `${expedienteAlumno.carpetaRaiz}/${sub}`;
     } else if (modulo === 'bitacora') {
       carpeta = 'Bitacora';
@@ -253,9 +266,11 @@ async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = 
       const apPat = (alu.apellidoPaterno || '').toUpperCase().trim();
       const apMat = (alu.apellidoMaterno || '').toUpperCase().trim();
       const nomP  = (alu.nombrePropio   || '').toUpperCase().trim();
-      const nombreAlu = [apPat, apMat, nomP].filter(Boolean).join(' ')
-                      || (expedienteAlumno.nombre || 'SIN-NOMBRE').toUpperCase();
-      carpeta = `Expedientes ${ciclo}/${nombreAlu.replace(/[<>:"/\\|?*]/g,'').trim()}`;
+      const nombreAlu = limpiarRutaStorage(
+        [apPat, apMat, nomP].filter(Boolean).join(' ')
+        || (expedienteAlumno.nombre || 'SIN-NOMBRE').toUpperCase()
+      );
+      carpeta = `Expedientes ${limpiarRutaStorage(ciclo)}/${nombreAlu}`;
     }
     // Renderizar en el DOM principal pero invisible — html2canvas necesita el documento principal
     const wrapper = document.createElement('div');
