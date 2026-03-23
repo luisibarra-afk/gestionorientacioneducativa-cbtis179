@@ -49,17 +49,11 @@ function initAlumnoAutocomplete(inputId, onSelect) {
           || am.includes(q) || np.includes(q) || completo.includes(q);
     }).slice(0, 10);
 
-    // Si no hay resultados y la lista está vacía, intentar descargar de Supabase y reintentar
     if (!matches.length) {
-      if (lista.length === 0 && typeof window.sbPullModulo === 'function' && !input._sbPulling) {
-        input._sbPulling = true;
+      if (lista.length === 0) {
         posicionar();
-        dropdown.innerHTML = '<li style="padding:8px 12px;color:#64748b;font-size:13px">Buscando alumnos...</li>';
-        window.sbPullModulo('alumnos').then(() => {
-          input._sbPulling = false;
-          // Reintentar búsqueda con los datos recién descargados
-          input.dispatchEvent(new Event('input'));
-        });
+        dropdown.innerHTML = '<li style="padding:8px 12px;color:#64748b;font-size:13px">' +
+          '<i class="fas fa-spinner fa-spin" style="margin-right:6px"></i>Cargando padrón, espera un momento...</li>';
       }
       return;
     }

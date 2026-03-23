@@ -82,8 +82,21 @@ function iniciarSupabase(url, key) {
       } else {
         setSupabaseStatus(true);
         mostrarToast('Supabase conectado correctamente');
-        // Al conectar, sincronizar datos desde la nube
-        window.sbPullAll();
+        // Cargar padrón primero (lo necesita el autocomplete), luego el resto
+        sbPullModulo('alumnos').then(() => {
+          // Si hay un autocomplete abierto esperando, reintentarlo
+          document.querySelectorAll('input[id$="-dropdown"]').forEach(() => {});
+          const inputsAC = document.querySelectorAll('.autocomplete-dropdown');
+          inputsAC.forEach(dd => {
+            if (dd.textContent.includes('Cargando padrón')) {
+              const inputId = dd.id.replace('-dropdown', '');
+              const inp = document.getElementById(inputId);
+              if (inp && inp.value.trim()) inp.dispatchEvent(new Event('input'));
+            }
+          });
+          // Luego el resto de módulos en background
+          window.sbPullAll();
+        });
       }
     });
   } catch (e) {
@@ -92,7 +105,7 @@ function iniciarSupabase(url, key) {
   }
 }
 
-function setSupabaseStatus(connected, msg) {
+function setSupabaseStatus(connected, _msg) {
   const el = document.getElementById('supabase-status');
   const info = document.getElementById('supabase-connected-info');
   if (!el) return;
