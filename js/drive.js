@@ -53,13 +53,14 @@ async function iniciarDrive() {
   try {
     const handle = await _recuperarHandleIDB();
     if (!handle) return;
-    // Verificar que el permiso sigue activo
+    // Siempre recordar el handle; el permiso se pide al guardar si hace falta
+    _driveHandle = handle;
     const perm = await handle.queryPermission({ mode: 'readwrite' });
     if (perm === 'granted') {
-      _driveHandle = handle;
       actualizarEstadoDrive(true, handle.name);
     } else {
-      actualizarEstadoDrive(false);
+      // Permiso expiró al cerrar el navegador — la carpeta sigue recordada
+      actualizarEstadoDrive(true, handle.name + ' (clic para activar)');
     }
   } catch { actualizarEstadoDrive(false); }
 }
