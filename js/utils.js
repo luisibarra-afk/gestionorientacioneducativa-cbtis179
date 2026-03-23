@@ -305,6 +305,25 @@ async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = 
   } catch (e) { mostrarToast('Error PDF nube: ' + e.message, 'error'); console.error('autoSubirPDF:', e); }
 }
 
+// Botón manual para subir PDF desde la tabla
+window._subirPDFManual = async function(modulo, id) {
+  const generadores = {
+    justificantes: (r,c) => _wrapMediaHoja(_htmlDocJust(r,c,true,true)),
+    citatorios:    (r,c) => _wrapMediaHoja(_htmlDocCit(r,c,true,true)),
+    permisos:      (r,c) => _wrapMediaHoja(_htmlDocPerm(r,c,true,true)),
+    reportes:      (r,c) => _htmlDocRep(r,c),
+    bitacora:      (r,c) => _htmlDocBit(r,c)
+  };
+  const fn = generadores[modulo];
+  if (!fn) return;
+  const rec = obtenerDatos(modulo).find(x => x.id === id);
+  if (!rec) return;
+  const cfg = obtenerConfig();
+  const expediente = { noControl: rec.noControl, nombre: rec.alumno || rec.involucrados, folio: rec.folio, tipo: modulo.slice(0,-1) };
+  mostrarToast('Subiendo PDF a la nube...');
+  await autoSubirPDF(fn(rec, cfg), expediente, modulo, id, ['justificantes','citatorios','permisos'].includes(modulo));
+};
+
 // Actividad reciente
 function registrarActividad(tipo, descripcion) {
   const actividad = obtenerDatos('actividad');

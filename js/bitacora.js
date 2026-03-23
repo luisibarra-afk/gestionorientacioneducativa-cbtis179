@@ -33,7 +33,7 @@ function renderBitacora(datos) {
         <div class="btn-actions">
           <button class="btn-icon view" title="Ver detalle" onclick="verIncidente('${b.id}')"><i class="fas fa-eye"></i></button>
           <button class="btn-icon print" title="Vista previa / PDF" onclick="imprimirIncidente('${b.id}')"><i class="fas fa-file-pdf"></i></button>
-          ${b.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${b.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Pendiente de subir a nube" disabled><i class="fas fa-cloud-upload-alt"></i></button>`}
+          ${b.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${b.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon delete" style="background:#f97316" title="Subir PDF a nube" onclick="window._subirPDFManual('bitacora','${b.id}')"><i class="fas fa-cloud-upload-alt"></i></button>`}
           <button class="btn-icon edit" title="Editar" onclick="editarIncidente('${b.id}')"><i class="fas fa-edit"></i></button>
           ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarIncidente('${b.id}')"><i class="fas fa-trash"></i></button>`:''}
         </div>

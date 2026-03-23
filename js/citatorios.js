@@ -17,7 +17,7 @@ function renderCitatorios(datos) {
       <td><small>${c.validador||'-'}</small></td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirCitatorio('${c.id}')"><i class="fas fa-file-pdf"></i></button>
-        ${c.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${c.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Pendiente de subir a nube" disabled><i class="fas fa-cloud-upload-alt"></i></button>`}
+        ${c.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${c.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon delete" style="background:#f97316" title="Subir PDF a nube" onclick="window._subirPDFManual('citatorios','${c.id}')"><i class="fas fa-cloud-upload-alt"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarCitatorio('${c.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarCitatorio('${c.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>

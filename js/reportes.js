@@ -27,7 +27,7 @@ function renderReportes(datos) {
       <td>${formatFecha(r.fecha)}</td>
       <td><div class="btn-actions">
         <button class="btn-icon print" title="PDF" onclick="imprimirReporte('${r.id}')"><i class="fas fa-file-pdf"></i></button>
-        ${r.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${r.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Pendiente de subir a nube" disabled><i class="fas fa-cloud-upload-alt"></i></button>`}
+        ${r.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${r.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon delete" style="background:#f97316" title="Subir PDF a nube" onclick="window._subirPDFManual('reportes','${r.id}')"><i class="fas fa-cloud-upload-alt"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarReporte('${r.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarReporte('${r.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
