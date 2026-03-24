@@ -336,11 +336,16 @@ function verExpediente(alumnoId) {
   const nombreAlu = a.nombre || [a.apellidoPaterno, a.apellidoMaterno].filter(Boolean).join(' ');
 
   function buscarEnModulo(modulo) {
-    return obtenerDatos(modulo).filter(r =>
-      (r.noControl && r.noControl === a.noControl) ||
-      (r.alumno && r.alumno === nombreAlu) ||
-      (r.alumno && r.alumno.toLowerCase().includes(nombreAlu.toLowerCase().split(' ')[0]))
-    );
+    return obtenerDatos(modulo).filter(r => {
+      // 1. Coincidencia exacta por número de control (más confiable)
+      if (a.noControl && r.noControl && r.noControl === a.noControl) return true;
+      // 2. Coincidencia exacta por nombre completo
+      if (r.alumno && r.alumno === nombreAlu) return true;
+      // 3. Coincidencia exacta por nombre completo construido desde apellidos
+      const nombreCompleto = [a.apellidoPaterno, a.apellidoMaterno, a.nombrePropio].filter(Boolean).join(' ').trim();
+      if (nombreCompleto && r.alumno && r.alumno === nombreCompleto) return true;
+      return false;
+    });
   }
 
   const just = buscarEnModulo('justificantes');
@@ -385,7 +390,7 @@ function verExpediente(alumnoId) {
       </div>
 
       ${seccionExpediente('Justificantes de Inasistencia', 'fa-file-medical', '#2563eb', just, [
-        {k:'folio',l:'Folio'}, {k:'fechaAusencia',l:'Fecha',f:'fecha'}, {k:'motivo',l:'Motivo'}, {k:'validador',l:'Validó'}
+        {k:'folio',l:'Folio'}, {k:'fechaAusencia',l:'Fecha'}, {k:'motivo',l:'Motivo'}, {k:'validador',l:'Validó'}
       ])}
       ${seccionExpediente('Permisos de Salida', 'fa-door-open', '#16a34a', perm, [
         {k:'folio',l:'Folio'}, {k:'fecha',l:'Fecha',f:'fecha'}, {k:'hora',l:'Hora'}, {k:'motivo',l:'Motivo'}, {k:'validador',l:'Validó'}
