@@ -121,6 +121,8 @@ function actualizarStats() {
   document.getElementById('stat-citatorios').textContent = obtenerDatos('citatorios').length;
   document.getElementById('stat-reportes').textContent = obtenerDatos('reportes').length;
   document.getElementById('stat-bitacora').textContent = obtenerDatos('bitacora').length;
+  const elVis = document.getElementById('stat-visitas');
+  if (elVis) elVis.textContent = obtenerDatos('oe_visitas').length;
 }
 
 const ACTIVITY_ICONS = {
