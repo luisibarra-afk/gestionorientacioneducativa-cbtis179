@@ -1,6 +1,6 @@
 // ===== UTILIDADES GLOBALES =====
 
-const PREFIJOS = { justificantes: 'JUS', permisos: 'PER', citatorios: 'CIT', reportes: 'REP', bitacora: 'BIT', alumnos: 'ALU' };
+const PREFIJOS = { justificantes: 'JUS', permisos: 'PER', citatorios: 'CIT', reportes: 'REP', bitacora: 'BIT', alumnos: 'ALU', VIS: 'VIS', oe_visitas: 'VIS' };
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -302,7 +302,7 @@ async function autoSubirPDF(htmlContent, expedienteAlumno, modulo, id, isHalf = 
       const datos = obtenerDatos(modulo);
       const rec = datos.find(x => x.id === id);
       if (rec) { rec.pdfUrl = url; guardarDatos(modulo, datos); if (window.sbSync) window.sbSync(modulo, [rec]); }
-      const renders = { justificantes: renderJustificantes, citatorios: renderCitatorios, permisos: renderPermisos, reportes: renderReportes, bitacora: renderBitacora, visitas: renderVisitas };
+      const renders = { justificantes: renderJustificantes, citatorios: renderCitatorios, permisos: renderPermisos, reportes: renderReportes, bitacora: renderBitacora, visitas: renderVisitas, oe_visitas: renderVisitas };
       if (renders[modulo]) renders[modulo]();
       mostrarToast('PDF subido a la nube ☁️');
     } else {
@@ -317,8 +317,9 @@ window._subirPDFManual = async function(modulo, id) {
     justificantes: (r,c) => _wrapMediaHoja(_htmlDocJust(r,c,true,true)),
     citatorios:    (r,c) => _wrapMediaHoja(_htmlDocCit(r,c,true,true)),
     permisos:      (r,c) => _wrapMediaHoja(_htmlDocPerm(r,c,true,true)),
-    reportes:      (r,c) => _htmlDocRep(r,c),
-    bitacora:      (r,c) => _htmlDocBit(r,c)
+    reportes:      (r,c) => _wrapMediaHoja(_htmlDocRep(r,c,true,true)),
+    bitacora:      (r,c) => _htmlDocBit(r,c),
+    oe_visitas:    (r)   => _htmlVisita(r)
   };
   const fn = generadores[modulo];
   if (!fn) return;

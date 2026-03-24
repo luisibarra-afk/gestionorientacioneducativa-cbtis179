@@ -18,7 +18,7 @@ function renderVisitas(datos) {
       <td><div class="btn-actions">
         <button class="btn-icon view" title="Ver expediente del grupo" onclick="verExpedienteGrupo('${encodeURIComponent(v.grupo||'')}')"><i class="fas fa-folder-open"></i></button>
         <button class="btn-icon print" title="PDF" onclick="imprimirVisita('${v.id}')"><i class="fas fa-file-pdf"></i></button>
-        ${v.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${v.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon drive-pend" title="Pendiente de subir a nube" disabled><i class="fas fa-cloud-upload-alt"></i></button>`}
+        ${v.pdfUrl?`<a class="btn-icon drive" title="Ver PDF en nube" href="${v.pdfUrl}" target="_blank"><i class="fas fa-cloud-download-alt"></i></a>`:`<button class="btn-icon delete" style="background:#f97316" title="Subir PDF a nube" onclick="window._subirPDFManual('oe_visitas','${v.id}')"><i class="fas fa-cloud-upload-alt"></i></button>`}
         <button class="btn-icon edit" title="Editar" onclick="editarVisita('${v.id}')"><i class="fas fa-edit"></i></button>
         ${esAdmin()?`<button class="btn-icon delete" title="Eliminar" onclick="eliminarVisita('${v.id}')"><i class="fas fa-trash"></i></button>`:''}
       </div></td>
@@ -121,19 +121,19 @@ function nuevaVisita() {
     _leerFotos(null, null, function(foto1, foto2) {
       const nuevo = {
         id: genId(),
-        folio: generarFolio('VIS'),
+        folio: generarFolio(KEY_VIS),
         ..._leerFormVisita(foto1, foto2),
         driveSaved: false,
       };
       const datos = obtenerDatos(KEY_VIS);
       datos.unshift(nuevo);
       guardarDatos(KEY_VIS, datos);
-      if (window.sbPush) window.sbPush(KEY_VIS, nuevo);
+      if (window.sbSync) window.sbSync(KEY_VIS, datos);
       registrarActividad('visita', `Visita ${nuevo.folio} — Grupo ${nuevo.grupo} — ${nuevo.tema}`);
       mostrarToast(`Visita ${nuevo.folio} registrada`);
       renderVisitas();
       cerrarModal();
-      _driveVisita(nuevo.id);
+      autoSubirPDF(_htmlVisita(nuevo), { carpetaRaiz: 'Visitas en el Aula', subcarpeta: nuevo.grupo || 'SIN_GRUPO', folio: nuevo.folio, tipo: 'visita' }, KEY_VIS, nuevo.id);
     });
   });
 }
@@ -152,10 +152,11 @@ function editarVisita(id) {
     _leerFotos(v.foto1, v.foto2, function(foto1, foto2) {
       Object.assign(v, _leerFormVisita(foto1, foto2));
       guardarDatos(KEY_VIS, datos);
-      if (window.sbPush) window.sbPush(KEY_VIS, v);
+      if (window.sbSync) window.sbSync(KEY_VIS, [v]);
       mostrarToast('Visita actualizada');
       renderVisitas();
       cerrarModal();
+      autoSubirPDF(_htmlVisita(v), { carpetaRaiz: 'Visitas en el Aula', subcarpeta: v.grupo || 'SIN_GRUPO', folio: v.folio, tipo: 'visita' }, KEY_VIS, v.id);
     });
   });
 }
