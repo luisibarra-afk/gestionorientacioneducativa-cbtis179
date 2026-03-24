@@ -62,6 +62,9 @@ function formularioReporte(datos = {}) {
       <div class="form-group"><label>Reportado por</label>
         <input type="text" id="r-reporta" class="form-control" value="${datos.reporta||''}" placeholder="Docente/orientador">
       </div>
+      <div class="form-group"><label>Emite / Valida</label>
+        <input type="text" id="r-validador" class="form-control" value="${datos.validador||(getUsuarioActual()?.nombre||'')}" readonly style="background:#f1f5f9;color:#475569;cursor:not-allowed">
+      </div>
       <div class="form-group form-full"><label>Descripción del Incidente *</label>
         <textarea id="r-descripcion" class="form-control" placeholder="Detalle lo sucedido...">${datos.descripcion||''}</textarea>
       </div>
@@ -89,6 +92,7 @@ function nuevoReporte() {
       fecha: document.getElementById('r-fecha').value,
       tipoFalta: document.getElementById('r-tipoFalta').value,
       reporta: document.getElementById('r-reporta').value.trim(),
+      validador: document.getElementById('r-validador').value.trim(),
       descripcion, medida: document.getElementById('r-medida').value,
       seguimiento: document.getElementById('r-seguimiento').value.trim()
     };
@@ -123,6 +127,7 @@ function editarReporte(id) {
     item.fecha = document.getElementById('r-fecha').value;
     item.tipoFalta = document.getElementById('r-tipoFalta').value;
     item.reporta = document.getElementById('r-reporta').value.trim();
+    item.validador = document.getElementById('r-validador').value.trim();
     item.descripcion = document.getElementById('r-descripcion').value.trim();
     item.medida = document.getElementById('r-medida').value;
     item.seguimiento = document.getElementById('r-seguimiento').value.trim();
