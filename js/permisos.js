@@ -104,6 +104,7 @@ function nuevoPermiso() {
     datos.unshift(nuevo);
     guardarDatos(KEY_PERM, datos);
     if (window.sbSync) window.sbSync(KEY_PERM, datos);
+    autoRegistrarAlumno(nuevo);
     registrarActividad('permiso', `Permiso ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderPermisos(); actualizarStats(); actualizarActividad();
     mostrarToast(`Permiso ${nuevo.folio} registrado`);

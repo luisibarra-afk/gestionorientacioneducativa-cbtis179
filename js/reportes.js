@@ -99,6 +99,7 @@ function nuevoReporte() {
     datos.unshift(nuevo);
     guardarDatos(KEY_REP, datos);
     if (window.sbSync) window.sbSync(KEY_REP, datos);
+    autoRegistrarAlumno(nuevo);
     registrarActividad('reporte', `Reporte ${nuevo.folio} — ${alumno} (${nuevo.tipoFalta})`);
     cerrarModal(); renderReportes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Reporte ${nuevo.folio} registrado`);

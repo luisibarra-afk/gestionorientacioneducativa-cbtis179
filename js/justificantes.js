@@ -100,6 +100,7 @@ function nuevoJustificante() {
     datos.unshift(nuevo);
     guardarDatos(KEY_JUST, datos);
     if (window.sbSync) window.sbSync(KEY_JUST, datos);
+    autoRegistrarAlumno(nuevo);
     registrarActividad('justificante', `Justificante ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderJustificantes(); actualizarStats(); actualizarActividad();
     mostrarToast(`Justificante ${nuevo.folio} registrado`);

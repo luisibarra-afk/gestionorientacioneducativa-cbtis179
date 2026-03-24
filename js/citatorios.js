@@ -109,6 +109,7 @@ function nuevoCitatorio() {
     datos.unshift(nuevo);
     guardarDatos(KEY_CIT, datos);
     if (window.sbSync) window.sbSync(KEY_CIT, datos);
+    autoRegistrarAlumno(nuevo);
     registrarActividad('citatorio', `Citatorio ${nuevo.folio} — tutor de ${alumno}`);
     cerrarModal(); renderCitatorios(); actualizarStats(); actualizarActividad();
     mostrarToast(`Citatorio ${nuevo.folio} registrado`);

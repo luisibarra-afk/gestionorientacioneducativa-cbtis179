@@ -44,6 +44,37 @@ function guardarDatos(key, data) {
   if (window.sbSync) window.sbSync(key, data);
 }
 
+// Auto-registra al alumno en el padrón si no existe
+function autoRegistrarAlumno(rec) {
+  if (!rec.alumno) return;
+  const alumnos = obtenerDatos('alumnos');
+  const norm = s => (s||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/Ñ/g,'N').trim();
+  const ya = alumnos.find(a =>
+    (rec.noControl && a.noControl && a.noControl === rec.noControl) ||
+    norm(a.nombre) === norm(rec.alumno)
+  );
+  if (ya) return;
+  const partes = rec.alumno.trim().split(/\s+/);
+  const nuevo = {
+    id: genId(),
+    nombre: rec.alumno,
+    apellidoPaterno: partes[0] || '',
+    apellidoMaterno: partes[1] || '',
+    nombrePropio: partes.slice(2).join(' ') || '',
+    noControl: rec.noControl || '',
+    grado: (rec.grado || '').replace('°','').trim(),
+    grupo: rec.grupo || '',
+    turno: rec.turno || '',
+    especialidad: rec.especialidad || '',
+    tutor: rec.tutor || '',
+    telefonoTutor: rec.telefonoTutor || '',
+  };
+  alumnos.push(nuevo);
+  guardarDatos('alumnos', alumnos);
+  if (window.sbBulkUpsertAlumnos) window.sbBulkUpsertAlumnos([nuevo]);
+  if (typeof refreshAlumnosCache === 'function') refreshAlumnosCache();
+}
+
 // Modal genérico
 function abrirModal(titulo, htmlContent, onSave) {
   document.getElementById('modal-title').textContent = titulo;
