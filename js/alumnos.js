@@ -335,15 +335,20 @@ function verExpediente(alumnoId) {
 
   const nombreAlu = a.nombre || [a.apellidoPaterno, a.apellidoMaterno].filter(Boolean).join(' ');
 
+  function normExp(s) {
+    return (s || '').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[Ñ]/g,'N').trim();
+  }
   function buscarEnModulo(modulo) {
+    const nombreCompleto = [a.apellidoPaterno, a.apellidoMaterno, a.nombrePropio].filter(Boolean).join(' ').trim();
+    const variantes = [nombreAlu, nombreCompleto].map(normExp).filter(Boolean);
     return obtenerDatos(modulo).filter(r => {
-      // 1. Coincidencia exacta por número de control (más confiable)
+      // 1. Coincidencia por número de control (más confiable)
       if (a.noControl && r.noControl && r.noControl === a.noControl) return true;
-      // 2. Coincidencia exacta por nombre completo
-      if (r.alumno && r.alumno === nombreAlu) return true;
-      // 3. Coincidencia exacta por nombre completo construido desde apellidos
-      const nombreCompleto = [a.apellidoPaterno, a.apellidoMaterno, a.nombrePropio].filter(Boolean).join(' ').trim();
-      if (nombreCompleto && r.alumno && r.alumno === nombreCompleto) return true;
+      // 2. Coincidencia por nombre ignorando acentos, Ñ y mayúsculas
+      if (r.alumno) {
+        const rNorm = normExp(r.alumno);
+        if (variantes.some(v => v && v === rNorm)) return true;
+      }
       return false;
     });
   }
