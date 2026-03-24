@@ -326,9 +326,14 @@ window._subirPDFManual = async function(modulo, id) {
   const rec = obtenerDatos(modulo).find(x => x.id === id);
   if (!rec) return;
   const cfg = obtenerConfig();
-  const expediente = { noControl: rec.noControl, nombre: rec.alumno || rec.involucrados, folio: rec.folio, tipo: modulo.slice(0,-1) };
+  let expediente;
+  if (modulo === 'oe_visitas') {
+    expediente = { carpetaRaiz: 'Visitas en el Aula', subcarpeta: rec.grupo || 'SIN_GRUPO', folio: rec.folio, tipo: 'visita' };
+  } else {
+    expediente = { noControl: rec.noControl, nombre: rec.alumno || rec.involucrados, folio: rec.folio, tipo: modulo.slice(0,-1) };
+  }
   mostrarToast('Subiendo PDF a la nube...');
-  await autoSubirPDF(fn(rec, cfg), expediente, modulo, id, ['justificantes','citatorios','permisos'].includes(modulo));
+  await autoSubirPDF(fn(rec, cfg), expediente, modulo, id, ['justificantes','citatorios','permisos','reportes'].includes(modulo));
 };
 
 // Actividad reciente
