@@ -113,6 +113,7 @@ function nuevoCitatorio() {
     registrarActividad('citatorio', `Citatorio ${nuevo.folio} — tutor de ${alumno}`);
     cerrarModal(); renderCitatorios(); actualizarStats(); actualizarActividad();
     mostrarToast(`Citatorio ${nuevo.folio} registrado`);
+    imprimirCitatorio(nuevo.id);
     autoSubirPDF(_wrapMediaHoja(_htmlDocCit(nuevo, obtenerConfig(), true, true)), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, especialidad: nuevo.especialidad, folio: nuevo.folio, tipo: 'citatorio' }, KEY_CIT, nuevo.id, true);
   });
   _acCitatorio();
