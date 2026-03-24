@@ -98,7 +98,6 @@ function nuevoPermiso() {
       persona: document.getElementById('p-persona').value.trim(),
       parentesco: document.getElementById('p-parentesco').value,
       telefono: document.getElementById('p-telefono').value.trim(),
-      autoriza: document.getElementById('p-autoriza').value.trim(),
       validador: document.getElementById('p-validador').value, motivo
     };
     datos.unshift(nuevo);
@@ -108,6 +107,7 @@ function nuevoPermiso() {
     registrarActividad('permiso', `Permiso ${nuevo.folio} — ${alumno}`);
     cerrarModal(); renderPermisos(); actualizarStats(); actualizarActividad();
     mostrarToast(`Permiso ${nuevo.folio} registrado`);
+    imprimirPermiso(nuevo.id);
     autoSubirPDF(_wrapMediaHoja(_htmlDocPerm(nuevo, obtenerConfig(), true, true)), { noControl: nuevo.noControl, nombre: nuevo.alumno, grado: nuevo.grado, grupo: nuevo.grupo, especialidad: nuevo.especialidad, folio: nuevo.folio, tipo: 'permiso' }, KEY_PERM, nuevo.id, true);
   });
   _acPermiso();
@@ -129,7 +129,6 @@ function editarPermiso(id) {
     item.persona = document.getElementById('p-persona').value.trim();
     item.parentesco = document.getElementById('p-parentesco').value;
     item.telefono = document.getElementById('p-telefono').value.trim();
-    item.autoriza = document.getElementById('p-autoriza').value.trim();
     item.validador = document.getElementById('p-validador').value;
     item.motivo = document.getElementById('p-motivo').value.trim();
     guardarDatos(KEY_PERM, datos);
