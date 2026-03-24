@@ -121,9 +121,9 @@ function imprimirVentana() {
   const el = document.getElementById('doc-to-pdf');
   if (!el) return;
   const css = `
-    @page { margin: 8mm; }
+    @page { size: A4 portrait; margin: 8mm; }
     *{ box-sizing:border-box; }
-    body{ margin:0; padding:0; background:#fff; font-family:'Times New Roman',serif; color:#111; }
+    body{ margin:0; padding:0; background:#fff; font-family:'Times New Roman',serif; color:#111; width:100%; }
     .doc-tipo-titulo{ font-size:18px; font-weight:900; text-transform:uppercase; letter-spacing:3px; text-align:center; color:#1e293b; margin-bottom:2px; }
     .doc-ciclo{ font-size:12px; color:#64748b; text-align:center; margin-bottom:14px; }
     .doc-folio-row{ display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:5px; padding:7px 14px; margin-bottom:18px; font-size:13px; }
@@ -148,7 +148,7 @@ function imprimirVentana() {
   if (iframe) iframe.remove();
   iframe = document.createElement('iframe');
   iframe.id = '_print_iframe';
-  iframe.style.cssText = 'position:fixed;top:-9999px;left:0;width:794px;height:1px;border:none';
+  iframe.style.cssText = 'position:fixed;top:-9999px;left:0;width:210mm;height:1px;border:none';
   document.body.appendChild(iframe);
   iframe.contentDocument.write(`<!DOCTYPE html><html><head><meta charset="utf-8">
     <title>Imprimir</title><style>${css}</style></head>
