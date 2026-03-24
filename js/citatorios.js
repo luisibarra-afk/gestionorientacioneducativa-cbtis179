@@ -100,7 +100,7 @@ function nuevoCitatorio() {
       tutor, telefonoTutor: document.getElementById('c-telefono').value.trim(),
       fechaCita: document.getElementById('c-fechaCita').value,
       horaCita: document.getElementById('c-horaCita').value,
-      emite: document.getElementById('c-emite').value.trim(),
+      emite: document.getElementById('c-validador').value,
       validador: document.getElementById('c-validador').value,
       estado: document.getElementById('c-estado').value,
       motivo, acuerdos: document.getElementById('c-acuerdos').value.trim(),
@@ -132,7 +132,7 @@ function editarCitatorio(id) {
     item.telefonoTutor = document.getElementById('c-telefono').value.trim();
     item.fechaCita = document.getElementById('c-fechaCita').value;
     item.horaCita = document.getElementById('c-horaCita').value;
-    item.emite = document.getElementById('c-emite').value.trim();
+    item.emite = document.getElementById('c-validador').value;
     item.validador = document.getElementById('c-validador').value;
     item.estado = document.getElementById('c-estado').value;
     item.motivo = document.getElementById('c-motivo').value.trim();
