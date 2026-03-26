@@ -46,7 +46,7 @@ const COLUMN_MAP = {
   convenios: {
     id:'id', folio:'folio', alumno:'alumno', noControl:'no_control', grado:'grado', grupo:'grupo',
     especialidad:'especialidad', tipo:'tipo', fecha:'fecha', estado:'estado',
-    observaciones:'observaciones', validador:'validador', pdfUrl:'pdf_url'
+    observaciones:'observaciones', validador:'validador', pdfUrl:'pdf_url', otrosAlumnos:'otros_alumnos'
   },
   alumnos: {
     id:'id', noControl:'no_control', nombre:'nombre',
