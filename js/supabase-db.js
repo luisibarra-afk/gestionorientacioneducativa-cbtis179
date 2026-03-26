@@ -9,7 +9,8 @@ const SB_TABLES = {
   citatorios: 'citatorios',
   reportes: 'reportes',
   bitacora: 'bitacora',
-  alumnos: 'alumnos'
+  alumnos: 'alumnos',
+  convenios: 'convenios'
 };
 
 // Mapeo de objetos JS (camelCase) a columnas DB (snake_case)
@@ -41,6 +42,11 @@ const COLUMN_MAP = {
     id:'id', folio:'folio', tipo:'tipo', gravedad:'gravedad', fecha:'fecha',
     hora:'hora', lugar:'lugar', reporta:'reporta', involucrados:'involucrados',
     descripcion:'descripcion', acciones:'acciones', seguimiento:'seguimiento', pdfUrl:'pdf_url'
+  },
+  convenios: {
+    id:'id', folio:'folio', alumno:'alumno', noControl:'no_control', grado:'grado', grupo:'grupo',
+    especialidad:'especialidad', tipo:'tipo', fecha:'fecha', estado:'estado',
+    observaciones:'observaciones', validador:'validador', pdfUrl:'pdf_url'
   },
   alumnos: {
     id:'id', noControl:'no_control', nombre:'nombre',
@@ -165,6 +171,7 @@ async function sbPullModulo(modulo) {
       citatorios: () => typeof renderCitatorios === 'function' && renderCitatorios(),
       reportes: () => typeof renderReportes === 'function' && renderReportes(),
       bitacora: () => typeof renderBitacora === 'function' && renderBitacora(),
+      convenios: () => typeof renderConvenios === 'function' && renderConvenios(),
       alumnos: () => { if (typeof renderAlumnos === 'function') renderAlumnos(); if (typeof refreshAlumnosCache === 'function') refreshAlumnosCache(); }
     };
     if (renders[modulo]) renders[modulo]();

@@ -25,6 +25,7 @@
       <li><a href="#" class="nav-link" data-page="reportes"><i class="fas fa-exclamation-triangle"></i><span>Reportes Disciplina</span></a></li>
       <li><a href="#" class="nav-link" data-page="bitacora"><i class="fas fa-shield-alt"></i><span>Bitácora Seguridad</span></a></li>
       <li><a href="#" class="nav-link" data-page="visitas"><i class="fas fa-chalkboard-teacher"></i><span>Visitas en el Aula</span></a></li>
+      <li><a href="#" class="nav-link" data-page="convenios"><i class="fas fa-handshake"></i><span>Convenios</span></a></li>
       <li><a href="#" class="nav-link" data-page="alumnos"><i class="fas fa-users"></i><span>Alumnos / Padrón</span></a></li>
       <li class="separator"></li>
       <li id="menu-config" class="hidden"><a href="#" class="nav-link" data-page="configuracion"><i class="fas fa-cog"></i><span>Configuración</span></a></li>
@@ -84,6 +85,10 @@
           <div class="stat-card blue" data-page="visitas">
             <div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div>
             <div class="stat-info"><h3 id="stat-visitas">0</h3><p>Visitas en el Aula</p></div>
+          </div>
+          <div class="stat-card green" data-page="convenios">
+            <div class="stat-icon"><i class="fas fa-handshake"></i></div>
+            <div class="stat-info"><h3 id="stat-convenios">0</h3><p>Convenios</p></div>
           </div>
         </div>
         <div class="recent-activity">
@@ -209,6 +214,26 @@
               <tr><th>Folio</th><th>Fecha</th><th>Grupo</th><th>Turno</th><th>Tema</th><th>Orientador(a)</th><th>Acciones</th></tr>
             </thead>
             <tbody id="tbody-visitas"><tr><td colspan="7" class="empty-row">No hay registros</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CONVENIOS -->
+      <div id="page-convenios" class="page">
+        <div class="page-header">
+          <h1><i class="fas fa-handshake"></i> Convenios</h1>
+          <button class="btn btn-primary" id="btn-nuevo-convenio"><i class="fas fa-plus"></i> Nuevo Convenio</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="search-convenios" placeholder="Buscar por alumno, tipo o estado..." class="search-input">
+          <button class="btn btn-outline" onclick="exportarCSV('convenios')"><i class="fas fa-file-csv"></i> CSV</button>
+        </div>
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr><th>Folio</th><th>Alumno</th><th>Grado/Grupo</th><th>Tipo</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="tbody-convenios"><tr><td colspan="7" class="empty-row">No hay convenios registrados</td></tr></tbody>
           </table>
         </div>
       </div>
@@ -431,6 +456,7 @@ create table if not exists alumnos (
   <script src="js/reportes.js?v=20260325"></script>
   <script src="js/bitacora.js?v=20260323"></script>
   <script src="js/visitas.js?v=20260325"></script>
+  <script src="js/convenios.js?v=20260326"></script>
   <script src="js/app.js?v=20260326"></script>
 </body>
 </html>

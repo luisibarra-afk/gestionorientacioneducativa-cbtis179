@@ -42,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initReportes();
   initBitacora();
   initVisitas();
+  initConvenios();
   initAlumnos();
   if (usuario.rol === 'admin') cargarFormConfig();
   actualizarStats();
@@ -98,6 +99,7 @@ const PAGE_TITLES = {
   reportes: 'Reportes de Indisciplina',
   bitacora: 'Bitácora de Seguridad',
   visitas: 'Visitas en el Aula',
+  convenios: 'Convenios',
   alumnos: 'Alumnos / Padrón',
   expediente: 'Expediente del Alumno',
   configuracion: 'Configuración'
@@ -123,6 +125,8 @@ function actualizarStats() {
   document.getElementById('stat-bitacora').textContent = obtenerDatos('bitacora').length;
   const elVis = document.getElementById('stat-visitas');
   if (elVis) elVis.textContent = obtenerDatos('oe_visitas').length;
+  const elCon = document.getElementById('stat-convenios');
+  if (elCon) elCon.textContent = obtenerDatos('convenios').length;
 }
 
 const ACTIVITY_ICONS = {

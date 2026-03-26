@@ -1,6 +1,6 @@
 // ===== UTILIDADES GLOBALES =====
 
-const PREFIJOS = { justificantes: 'JUS', permisos: 'PER', citatorios: 'CIT', reportes: 'REP', bitacora: 'BIT', alumnos: 'ALU', VIS: 'VIS', oe_visitas: 'VIS' };
+const PREFIJOS = { justificantes: 'JUS', permisos: 'PER', citatorios: 'CIT', reportes: 'REP', bitacora: 'BIT', alumnos: 'ALU', VIS: 'VIS', oe_visitas: 'VIS', convenios: 'CON' };
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
