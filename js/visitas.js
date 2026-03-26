@@ -287,6 +287,17 @@ function verExpedienteGrupo(grupoEnc) {
 
 // ===== INIT =====
 function initVisitas() {
+  // Corregir folios con prefijo "undefined" de registros viejos
+  const datos = obtenerDatos(KEY_VIS);
+  let fix = false;
+  datos.forEach(v => {
+    if (v.folio && v.folio.startsWith('undefined-')) {
+      v.folio = 'VIS-' + v.folio.replace('undefined-', '');
+      fix = true;
+    }
+  });
+  if (fix) guardarDatos(KEY_VIS, datos);
+
   document.getElementById('btn-nueva-visita').addEventListener('click', nuevaVisita);
   filtrarTabla('search-visitas', 'tbody-visitas');
   renderVisitas();
